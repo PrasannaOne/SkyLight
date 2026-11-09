@@ -595,65 +595,55 @@
         }
 
 
-        /* Final compact finish: typography leads, controls stay tactile, settings stay short. */
-        .brand-pill {
-            gap: 0;
-            padding: 9px 17px;
-            border-radius: 17px;
-            background: rgba(13, 12, 26, .68);
-            border-color: rgba(204, 190, 255, .13);
-        }
+        /* Relaxed Settings: the original concise sheet, with the refined palette. */
+        .brand-pill { gap: 0; padding: 9px 17px; border-radius: 17px; }
         .brand-title { font-size: 1.12rem; letter-spacing: -.42px; }
+        .modal-card:focus { outline: none; }
         .modal-card {
-            padding: 14px 19px calc(12px + env(safe-area-inset-bottom, 0px));
-            max-height: min(84vh, 650px);
+            max-width: 400px;
+            max-height: min(88vh, 760px);
+            padding: 24px 20px calc(26px + env(safe-area-inset-bottom, 0px));
+            border-radius: 28px 28px 0 0;
         }
-        @supports (height: 100dvh) { .modal-card { max-height: min(84dvh, 650px); } }
-        .modal-header { margin: 1px 0 5px; }
-        .modal-header h3 { font-size: 1.08rem; }
-        .settings-kicker { display: none; }
+        @supports (height: 100dvh) { .modal-card { max-height: min(88dvh, 760px); } }
+        .modal-header { margin: 0 0 12px; align-items: center; }
+        .modal-header h3 { font-size: 1.12rem; letter-spacing: -.25px; }
+        .close-x {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: rgba(255,255,255,.08); border-color: var(--border);
+            color: var(--text); font-size: .85rem;
+        }
         .vibe-desc {
-            padding: 0;
-            margin: 0 0 8px;
-            border: 0;
-            background: transparent;
-            font-size: .78rem;
-            line-height: 1.45;
-            color: #a9a2ba;
+            padding: 0; margin: 0 0 16px; border: 0; border-radius: 0;
+            background: transparent; color: var(--text-muted);
+            font-size: .85rem; line-height: 1.55;
         }
-        .settings-section { margin-top: 9px; }
-        .section-heading { margin-bottom: 7px; }
-        .theme-grid { gap: 7px; }
-        .theme-btn { min-height: 46px; padding: 7px 10px; border-radius: 13px; }
-        .swatch { width: 16px; height: 16px; }
-        .theme-name { font-size: .77rem; }
-        .theme-mood { font-size: .63rem; }
-        .guide-card { padding: 1px 12px; border-radius: 14px; }
-        .guide-row { gap: 9px; padding: 6px 0; }
-        .guide-icon { width: 25px; height: 25px; flex-basis: 25px; border-radius: 8px; font-size: .78rem; }
-        .guide-copy strong { margin-bottom: 1px; font-size: .74rem; }
-        .guide-copy span { font-size: .68rem; line-height: 1.38; }
-        .settings-note { margin: 6px 1px 0; font-size: .64rem; }
-        .creator-strip {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin: 9px 0 7px;
-            padding: 8px 0 0;
-            border-top: 1px solid rgba(194,181,229,.11);
+        .section-label { margin: 0 0 8px; color: var(--text-muted); font-size: .72rem; letter-spacing: .8px; }
+        .theme-grid { gap: 8px; margin: 0 0 18px; }
+        .theme-btn {
+            min-height: 0; padding: 11px 12px; border-radius: 14px;
+            gap: 9px; text-align: left; font-size: .82rem;
         }
-        .creator-credit { color: #c9c2d9; font-size: .73rem; font-weight: 650; white-space: nowrap; }
-        .creator-credit span { color: #f08b9b; }
-        .creator-strip .creator-links { display: flex; gap: 6px; }
-        .creator-strip .social-btn { padding: 7px 10px; border-radius: 9px; font-size: .68rem; }
-        .share-full-btn { min-height: 38px; padding: 8px 12px; border-radius: 12px; font-size: .80rem; }
-        .icon-btn { border-radius: 14px; }
-        .icon-btn:active:not(:disabled), .theme-btn:active, .share-full-btn:active { transform: scale(.965); }
+        .swatch { width: 14px; height: 14px; border: 0; box-shadow: none; }
+        .creator-box {
+            margin: 0 0 14px; padding: 15px; border-radius: 18px;
+            background: rgba(8, 11, 18, .76); border-color: rgba(224, 215, 198, .09);
+        }
+        .creator-top { gap: 12px; margin-bottom: 12px; }
+        .avatar-circle { width: 40px; height: 40px; border-radius: 12px; }
+        .creator-links { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .social-btn { padding: 9px; border-radius: 11px; font-size: .8rem; }
+        .share-full-btn { min-height: 0; padding: 13px; border-radius: 14px; font-size: .88rem; }
+        .icon-btn:active:not(:disabled), .theme-btn:active, .share-full-btn:active { transform: scale(.975); }
         @media (max-width: 380px) {
-            .modal-card { padding-left: 15px; padding-right: 15px; }
-            .creator-strip { gap: 6px; }
-            .creator-strip .social-btn { padding: 7px 8px; }
+            .modal-card { padding-left: 17px; padding-right: 17px; }
+            .theme-btn { padding-left: 9px; gap: 8px; }
+        }
+        @media (max-height: 640px) {
+            .modal-card { max-height: 94vh; }
+        }
+        @supports (height: 94dvh) {
+            @media (max-height: 640px) { .modal-card { max-height: 94dvh; } }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -700,69 +690,45 @@
     <div class="modal" id="infoModal" onclick="if(event.target===this) closeModal('infoModal')" role="presentation">
         <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-describedby="settingsIntro" tabindex="-1">
             <div class="modal-header">
-                <div>
-                    <h3 id="settingsTitle">SkyLight</h3>
-                </div>
+                <h3 id="settingsTitle">SkyLight</h3>
                 <button class="close-x" onclick="closeModal('infoModal')" aria-label="Close settings" title="Close">✕</button>
             </div>
 
-            <p class="vibe-desc" id="settingsIntro">An endless sky. Draw a little, drift a little.</p>
+            <p class="vibe-desc" id="settingsIntro">
+                Your own little pocket night sky. Touch a star and gently sweep through another to connect them and hear the soft harp notes. Touch empty space to drift, or pinch with two fingers to zoom. Your sky saves automatically.
+            </p>
 
-            <section class="settings-section" aria-labelledby="themeHeading">
-                <div class="section-heading">
-                    <div class="section-label" id="themeHeading">YOUR ATMOSPHERE</div>
-                    <span class="section-hint">Choose a mood</span>
-                </div>
-                <div class="theme-grid">
-                    <button class="theme-btn active" id="th-white" onclick="setSkyTheme('white')" aria-pressed="true">
-                        <span class="swatch" style="--swatch-color:#eee7d9;background:#eee7d9;"></span>
-                        <span class="theme-copy"><span class="theme-name">White</span><span class="theme-mood">Soft moonlight</span></span>
-                        <span class="theme-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button class="theme-btn" id="th-blue" onclick="setSkyTheme('blue')" aria-pressed="false">
-                        <span class="swatch" style="--swatch-color:#83c9e8;background:#83c9e8;"></span>
-                        <span class="theme-copy"><span class="theme-name">Blue</span><span class="theme-mood">Quiet midnight</span></span>
-                        <span class="theme-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button class="theme-btn" id="th-pink" onclick="setSkyTheme('pink')" aria-pressed="false">
-                        <span class="swatch" style="--swatch-color:#e6aecb;background:#e6aecb;"></span>
-                        <span class="theme-copy"><span class="theme-name">Pink</span><span class="theme-mood">Rose dusk</span></span>
-                        <span class="theme-check" aria-hidden="true">✓</span>
-                    </button>
-                    <button class="theme-btn" id="th-gold" onclick="setSkyTheme('gold')" aria-pressed="false">
-                        <span class="swatch" style="--swatch-color:#e6cc91;background:#e6cc91;"></span>
-                        <span class="theme-copy"><span class="theme-name">Gold</span><span class="theme-mood">Warm starlight</span></span>
-                        <span class="theme-check" aria-hidden="true">✓</span>
-                    </button>
-                </div>
-            </section>
+            <div class="section-label">Theme</div>
+            <div class="theme-grid">
+                <button class="theme-btn active" id="th-white" onclick="setSkyTheme('white')" aria-pressed="true">
+                    <span class="swatch" style="background:#ffffff;"></span>White
+                </button>
+                <button class="theme-btn" id="th-blue" onclick="setSkyTheme('blue')" aria-pressed="false">
+                    <span class="swatch" style="background:#7dd3fc;"></span>Blue
+                </button>
+                <button class="theme-btn" id="th-pink" onclick="setSkyTheme('pink')" aria-pressed="false">
+                    <span class="swatch" style="background:#f9a8d4;"></span>Pink
+                </button>
+                <button class="theme-btn" id="th-gold" onclick="setSkyTheme('gold')" aria-pressed="false">
+                    <span class="swatch" style="background:#fde047;"></span>Gold
+                </button>
+            </div>
 
-            <section class="settings-section" aria-labelledby="guideHeading">
-                <div class="section-heading">
-                    <div class="section-label" id="guideHeading">JUST TWO THINGS</div>
-                    <span class="section-hint">That's all</span>
-                </div>
-                <div class="guide-card">
-                    <div class="guide-row">
-                        <span class="guide-icon" aria-hidden="true">✦</span>
-                        <div class="guide-copy"><strong>Connect</strong><span>Start on a star and trace across another to join them.</span></div>
-                    </div>
-                    <div class="guide-row">
-                        <span class="guide-icon" aria-hidden="true">⌖</span>
-                        <div class="guide-copy"><strong>Explore</strong><span>Drag empty sky to move. Pinch to zoom.</span></div>
+            <div class="creator-box">
+                <div class="creator-top">
+                    <div class="avatar-circle">P</div>
+                    <div>
+                        <div style="font-weight:700; font-size:0.95rem;">Crafted by Prasanna ♥️</div>
+                        <div style="font-size:0.74rem; color:var(--text-muted); margin-top:2px;">@prasannaone</div>
                     </div>
                 </div>
-                <p class="settings-note">Saved on this device · Undo your last 10 connections.</p>
-            </section>
-
-            <div class="creator-strip">
-                <div class="creator-credit">Made by Prasanna <span aria-label="love">♥</span></div>
                 <div class="creator-links">
-                    <a href="https://github.com/PrasannaOne/SkyLight" target="_blank" rel="noopener noreferrer" class="social-btn">GitHub ↗</a>
-                    <a href="https://t.me/prasannaone" target="_blank" rel="noopener noreferrer" class="social-btn">Telegram ↗</a>
+                    <a href="https://github.com/PrasannaOne/SkyLight" target="_blank" rel="noopener noreferrer" class="social-btn">GitHub</a>
+                    <a href="https://t.me/prasannaone" target="_blank" rel="noopener noreferrer" class="social-btn">Telegram</a>
                 </div>
             </div>
-            <button class="share-full-btn" onclick="shareApp()">Share SkyLight&nbsp; ↗</button>
+
+            <button class="share-full-btn" onclick="shareApp()">Share SkyLight</button>
         </div>
     </div>
 
@@ -811,9 +777,9 @@
             MIN_STAR_SEPARATION: 102,   // Minimum world distance between stars in a chunk
             MAX_LINK_WORLD_DIST: 420,   // Generous reach so neighbor stars always connect
             STAR_GRAB_RADIUS_PX: 26,    // Comfortable touch target without grabbing stars from too far away
-            STAR_SNAP_RADIUS_PX: 21,    // A deliberate crossing, not a broad magnetic grab
-            STAR_PREVIEW_RADIUS_PX: 30, // Show the target just before the connection is made
-            STAR_TRACE_CORRIDOR_PX: 14, // Keep the finger path close to the star centre
+            STAR_SNAP_RADIUS_PX: 42,    // Restored comfortable reach; direction and trace corridor prevent side-snaps
+            STAR_PREVIEW_RADIUS_PX: 46, // Soft preview before a deliberate connection
+            STAR_TRACE_CORRIDOR_PX: 24, // Allow for a fingertip covering part of the target
             MIN_ZOOM: 0.08,             // Deep wide-angle zoom-out to view creations across space
             MAX_ZOOM: 1.0,              // Normal 1:1 close view
             DRAW_MIN_ZOOM: 0.30,        // Draw comfortably even when zoomed out
@@ -833,8 +799,8 @@
                 skyBot: '#121322',
                 haze: 'rgba(154, 133, 206, 0.035)',
                 accent: '#d8c9f3',
-                threadCore: 'rgba(246, 239, 226, 0.76)',
-                threadAura: 'rgba(216, 199, 174, 0.115)',
+                threadCore: 'rgba(246, 239, 226, 0.93)',
+                threadAura: 'rgba(216, 199, 174, 0.19)',
                 starRGB: '245, 239, 228',
                 hillFar: '#0b101a',
                 hillNear: '#080b13'
@@ -846,8 +812,8 @@
                 skyBot: '#101d30',
                 haze: 'rgba(139, 185, 207, 0.035)',
                 accent: '#9bc8dc',
-                threadCore: 'rgba(225, 239, 246, 0.76)',
-                threadAura: 'rgba(139, 185, 207, 0.12)',
+                threadCore: 'rgba(225, 239, 246, 0.93)',
+                threadAura: 'rgba(139, 185, 207, 0.19)',
                 starRGB: '205, 226, 236',
                 hillFar: '#0a111b',
                 hillNear: '#070b13'
@@ -859,8 +825,8 @@
                 skyBot: '#211426',
                 haze: 'rgba(205, 158, 185, 0.032)',
                 accent: '#dbaec7',
-                threadCore: 'rgba(246, 226, 237, 0.76)',
-                threadAura: 'rgba(205, 158, 185, 0.12)',
+                threadCore: 'rgba(246, 226, 237, 0.93)',
+                threadAura: 'rgba(205, 158, 185, 0.19)',
                 starRGB: '235, 215, 228',
                 hillFar: '#120d18',
                 hillNear: '#0b0810'
@@ -872,8 +838,8 @@
                 skyBot: '#211a13',
                 haze: 'rgba(210, 183, 132, 0.03)',
                 accent: '#d8c49b',
-                threadCore: 'rgba(244, 233, 209, 0.76)',
-                threadAura: 'rgba(210, 183, 132, 0.115)',
+                threadCore: 'rgba(244, 233, 209, 0.93)',
+                threadAura: 'rgba(210, 183, 132, 0.19)',
                 starRGB: '238, 225, 198',
                 hillFar: '#14110c',
                 hillNear: '#0b0907'
@@ -1177,90 +1143,82 @@
         //    No ambient music, no theme/undo sounds, and no echo loop.
         // =====================================================================
         let audioCtx = null;
-        let connectionBus = null;
-        let connectionAudioMuted = true;
-        const activeConnectionVoices = new Set();
+        let masterEcho = null;
+        let lastNoteTime = 0;
 
         function ensureAudio() {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContextClass) return false;
             if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+
+                masterEcho = audioCtx.createDelay(1.0);
+                masterEcho.delayTime.value = 0.46;
+
+                const fb = audioCtx.createGain();
+                fb.gain.value = 0.3;
+
+                const lp = audioCtx.createBiquadFilter();
+                lp.type = 'lowpass';
+                lp.frequency.value = 600;
+
+                masterEcho.connect(lp);
+                lp.connect(fb);
+                fb.connect(masterEcho);
+                lp.connect(audioCtx.destination);
+            } else if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSlowHarpNote(freq, bypassThrottle = false) {
+            if (!audioCtx) return;
+            const nowMs = performance.now();
+            const delayMs = (!bypassThrottle && nowMs - lastNoteTime < 220)
+                ? (220 - (nowMs - lastNoteTime))
+                : 0;
+            lastNoteTime = nowMs + delayMs;
+
+            setTimeout(() => {
+                if (!audioCtx) return;
                 try {
-                    audioCtx = new AudioContextClass();
-                    connectionBus = audioCtx.createGain();
-                    connectionBus.gain.value = 0;
-                    connectionBus.connect(audioCtx.destination);
-                } catch (e) {
-                    audioCtx = null;
-                    connectionBus = null;
-                    return false;
-                }
-            }
-            if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-            return true;
-        }
-
-        function playConnectionNote(freq) {
-            if (!ensureAudio() || !audioCtx || !connectionBus) return;
-            try {
-                const now = audioCtx.currentTime;
-                if (connectionAudioMuted) {
-                    connectionBus.gain.cancelScheduledValues(now);
-                    connectionBus.gain.setValueAtTime(0, now);
-                    connectionBus.gain.linearRampToValueAtTime(0.15, now + 0.025);
-                    connectionAudioMuted = false;
-                }
-
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(1250, now);
-                filter.frequency.exponentialRampToValueAtTime(470, now + 0.58);
-                filter.connect(connectionBus);
-
-                const voice = { oscillators: [], nodes: [filter], pending: 2 };
-                const makeVoice = (type, noteFreq, peak, offset) => {
+                    const now = audioCtx.currentTime;
                     const osc = audioCtx.createOscillator();
+                    const sub = audioCtx.createOscillator();
+                    const filter = audioCtx.createBiquadFilter();
                     const gain = audioCtx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(noteFreq, now);
+                    const subGain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    sub.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
+                    sub.frequency.setValueAtTime(freq * 0.5, now);
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(650, now);
+                    filter.frequency.exponentialRampToValueAtTime(260, now + 2.8);
+
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(peak, now + 0.028 + offset);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
+                    gain.gain.linearRampToValueAtTime(0.055, now + 0.06);
+                    gain.gain.exponentialRampToValueAtTime(0.0002, now + 3.0);
+
+                    subGain.gain.setValueAtTime(0.0001, now);
+                    subGain.gain.linearRampToValueAtTime(0.024, now + 0.08);
+                    subGain.gain.exponentialRampToValueAtTime(0.0002, now + 3.2);
+
                     osc.connect(gain);
+                    sub.connect(subGain);
                     gain.connect(filter);
-                    voice.nodes.push(osc, gain);
-                    osc.onended = () => {
-                        voice.pending -= 1;
-                        if (voice.pending <= 0) {
-                            activeConnectionVoices.delete(voice);
-                            voice.nodes.forEach(node => { try { node.disconnect(); } catch (e) {} });
-                        }
-                    };
-                    osc.start(now + offset);
-                    osc.stop(now + 0.66);
-                    voice.oscillators.push(osc);
-                };
+                    subGain.connect(filter);
 
-                makeVoice('sine', freq, 0.045, 0);
-                makeVoice('triangle', freq * 0.5, 0.012, 0.012);
-                activeConnectionVoices.add(voice);
-                if (activeConnectionVoices.size > 7) {
-                    const oldest = activeConnectionVoices.values().next().value;
-                    if (oldest) oldest.oscillators.forEach(osc => { try { osc.stop(now + 0.08); } catch (e) {} });
-                }
-            } catch (e) {}
-        }
+                    filter.connect(audioCtx.destination);
+                    if (masterEcho) filter.connect(masterEcho);
 
-        function stopConnectionAudio() {
-            if (!audioCtx || !connectionBus || connectionAudioMuted) return;
-            const now = audioCtx.currentTime;
-            connectionBus.gain.cancelScheduledValues(now);
-            connectionBus.gain.setValueAtTime(Math.max(0.0001, connectionBus.gain.value), now);
-            connectionBus.gain.linearRampToValueAtTime(0.0001, now + 0.085);
-            for (const voice of activeConnectionVoices) {
-                voice.oscillators.forEach(osc => { try { osc.stop(now + 0.10); } catch (e) {} });
-            }
-            connectionAudioMuted = true;
+                    osc.start(now);
+                    sub.start(now);
+                    osc.stop(now + 3.05);
+                    sub.stop(now + 3.25);
+                } catch (e) {}
+            }, delayMs);
         }
 
         // =====================================================================
@@ -1320,7 +1278,9 @@
         // direction of travel, not merely whichever happens to be a pixel closer.
         function findBestStarOnSwipe(sx, sy, moveX, moveY) {
             const moveLength = Math.hypot(moveX, moveY);
-            if (moveLength < 3) return null;
+            if (moveLength < 2) {
+                return findNearestStarOnScreen(sx, sy, CONFIG.STAR_GRAB_RADIUS_PX, true);
+            }
 
             const dirX = moveX / moveLength;
             const dirY = moveY / moveLength;
@@ -1471,7 +1431,7 @@
             saveStateToStorage();
 
             const scB = worldToScreen(starB.x, starB.y);
-            playConnectionNote(starB.freq);
+            playSlowHarpNote(starB.freq);
             spawnScreenBurst(scB.x, scB.y, closingPath ? 14 : 9);
             if (closingPath) {
                 addLoopPulse(closingPath);
@@ -1558,7 +1518,6 @@
                     gesture.lastPanTime = e.timeStamp;
                 }
             } else if (activePointers.size === 2) {
-                if (gesture.mode === 'weave') stopConnectionAudio();
                 cam.vx = 0;
                 cam.vy = 0;
                 gesture.mode = 'pinch';
@@ -1660,7 +1619,6 @@
             activePointers.delete(e.pointerId);
 
             if (activePointers.size === 0) {
-                if (gesture.mode === 'weave') stopConnectionAudio();
                 if (gesture.mode === 'pan' || gesture.mode === 'pinch') {
                     saveStateToStorage();
                 }
@@ -1759,14 +1717,16 @@
 
         function spawnDeepSpaceMeteor() {
             if (prefersReducedMotion || deepSpaceMeteors.length >= 2 || document.hidden) return;
-            const halfW = (W * 0.5) / cam.zoom;
-            const halfH = (H * 0.5) / cam.zoom;
+            const zoomScale = Math.max(cam.zoom, 0.08);
+            const halfW = (W * 0.5) / zoomScale;
+            const halfH = (H * 0.5) / zoomScale;
             const side = Math.floor(Math.random() * 4);
-            const speed = 1.25 + Math.random() * 0.85;
+            // Keep the meteor's screen speed consistent when zooming far out.
+            const speed = (1.45 + Math.random() * 0.85) / zoomScale;
             const spread = (Math.random() - 0.5) * 0.62;
             const baseAngles = [0, Math.PI, Math.PI * 0.5, -Math.PI * 0.5];
             const angle = baseAngles[side] + spread;
-            const pad = 140;
+            const pad = 72 / zoomScale;
             let x, y;
 
             if (side === 0) {
@@ -1787,7 +1747,7 @@
                 x, y,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                len: 70 + Math.random() * 65,
+                len: (82 + Math.random() * 52) / zoomScale,
                 life: 1.0,
                 decay: 0.0028 + Math.random() * 0.0015
             });
@@ -2014,13 +1974,21 @@
                     m.y - (m.vy / speedLength) * m.len
                 );
                 const mg = ctx.createLinearGradient(head.x, head.y, tail.x, tail.y);
-                mg.addColorStop(0, `rgba(232, 222, 207, ${m.life * 0.24})`);
+                mg.addColorStop(0, `rgba(232, 222, 207, ${m.life * 0.56})`);
                 mg.addColorStop(1, 'rgba(232, 222, 207, 0)');
                 ctx.strokeStyle = mg;
+                ctx.lineWidth = 1.35;
+                ctx.shadowColor = 'rgba(232, 222, 207, 0.5)';
+                ctx.shadowBlur = 9;
                 ctx.beginPath();
                 ctx.moveTo(head.x, head.y);
                 ctx.lineTo(tail.x, tail.y);
                 ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = `rgba(245, 239, 228, ${m.life * 0.72})`;
+                ctx.beginPath();
+                ctx.arc(head.x, head.y, 1.45, 0, Math.PI * 2);
+                ctx.fill();
             }
             ctx.restore();
 
@@ -2037,21 +2005,28 @@
                 const tx = ss.sx - (ss.vx / 7) * ss.len;
                 const ty = ss.sy - (ss.vy / 7) * ss.len;
                 const g = ctx.createLinearGradient(ss.sx, ss.sy, tx, ty);
-                g.addColorStop(0, `rgba(238, 231, 218, ${ss.life * 0.38})`);
+                g.addColorStop(0, `rgba(238, 231, 218, ${ss.life * 0.72})`);
                 g.addColorStop(1, 'rgba(238, 231, 218, 0)');
                 ctx.strokeStyle = g;
-                ctx.lineWidth = 1.0;
+                ctx.lineWidth = 1.4;
+                ctx.shadowColor = 'rgba(238, 231, 218, 0.48)';
+                ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.moveTo(ss.sx, ss.sy);
                 ctx.lineTo(tx, ty);
                 ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = `rgba(255, 250, 239, ${ss.life * 0.82})`;
+                ctx.beginPath();
+                ctx.arc(ss.sx, ss.sy, 1.55, 0, Math.PI * 2);
+                ctx.fill();
             }
 
             // 7. Drawn Constellation Threads
             ctx.save();
             ctx.lineCap = 'round';
-            const auraWidth = Math.max(1.5, 4.4 * zScale);
-            const coreWidth = Math.max(0.72, 1.30 * zScale);
+            const auraWidth = Math.max(2.2, 6.0 * zScale);
+            const coreWidth = Math.max(1.05, 1.72 * zScale);
 
             for (const e of edges) {
                 const sA = savedStars.get(e.aId);
@@ -2356,7 +2331,6 @@
         let rafId = 0;
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                stopConnectionAudio();
                 cancelAnimationFrame(rafId);
                 rafId = 0;
                 lastFrameTime = 0;
@@ -2370,13 +2344,16 @@
         window.addEventListener('resize', resize);
         resize();
         loadStateFromStorage();
-        setTimeout(spawnShootingStar, 8000);
+        setTimeout(() => {
+            spawnShootingStar();
+            spawnDeepSpaceMeteor();
+        }, 3600);
         setInterval(() => {
-            if (Math.random() < 0.65) spawnShootingStar();
-        }, 28000);
+            if (Math.random() < 0.80) spawnShootingStar();
+        }, 16000);
         setInterval(() => {
-            if (Math.random() < 0.35) spawnDeepSpaceMeteor();
-        }, 12000);
+            if (Math.random() < 0.68) spawnDeepSpaceMeteor();
+        }, 9000);
         rafId = requestAnimationFrame(renderFrame);
     </script>
 </body>
