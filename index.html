@@ -17,12 +17,12 @@
 
         /* --- 1. THEME VARIABLES & RESET --- */
         :root {
-            --bg: #000000;
-            --glass: rgba(14, 19, 30, 0.76);
-            --border: rgba(255, 255, 255, 0.16);
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent: #ffffff;
+            --bg: #070911;
+            --glass: rgba(16, 19, 30, 0.72);
+            --border: rgba(224, 215, 198, 0.12);
+            --text: #eee9df;
+            --text-muted: #a2a0ac;
+            --accent: #e9dfcf;
         }
 
         * {
@@ -63,19 +63,19 @@
             display: inline-flex;
             align-items: center;
             background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 10px 18px;
+            backdrop-filter: blur(18px) saturate(115%);
+            -webkit-backdrop-filter: blur(18px) saturate(115%);
+            padding: 10px 17px;
             border-radius: 24px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 245, 226, 0.035);
         }
 
         .brand-title {
             font-size: 1.18rem;
             font-weight: 700;
             letter-spacing: -0.2px;
-            color: #ffffff;
+            color: #f0e9dc;
         }
 
         .top-actions {
@@ -87,8 +87,8 @@
 
         .icon-btn {
             background: var(--glass);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(18px) saturate(115%);
+            -webkit-backdrop-filter: blur(18px) saturate(115%);
             border: 1px solid var(--border);
             color: var(--text);
             width: 44px;
@@ -98,8 +98,8 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65);
-            transition: transform 0.14s ease, opacity 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 245, 226, 0.035);
+            transition: transform 0.18s cubic-bezier(.2,.7,.2,1), opacity 0.2s ease, border-color 0.2s ease, background 0.2s ease;
         }
 
         .icon-btn:active {
@@ -129,15 +129,22 @@
             height: 100vh;
             z-index: 5;
             display: block;
+            touch-action: none;
+        }
+
+        @supports (height: 100dvh) {
+            html, body { height: 100dvh; }
+            #skyCanvas { height: 100dvh; }
+            .modal-card { max-height: min(88dvh, 760px); }
         }
 
         /* --- 4. MODAL & CREATOR CARD --- */
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.76);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(4, 6, 12, 0.72);
+            backdrop-filter: blur(14px) saturate(112%);
+            -webkit-backdrop-filter: blur(14px) saturate(112%);
             display: flex;
             align-items: flex-end;
             justify-content: center;
@@ -160,19 +167,24 @@
         }
 
         .modal-card {
-            background: rgba(13, 17, 26, 0.96);
+            background: linear-gradient(155deg, rgba(20, 22, 34, 0.98), rgba(11, 14, 23, 0.98));
             border: 1px solid var(--border);
             border-radius: 28px 28px 0 0;
             padding: 24px 20px calc(26px + env(safe-area-inset-bottom, 0px));
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+            max-height: min(88vh, 760px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            box-shadow: 0 22px 56px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 245, 226, 0.035);
         }
 
         @media (min-width: 540px) {
             .modal-card {
                 border-radius: 26px;
                 padding-bottom: 26px;
+                max-height: min(86vh, 760px);
             }
         }
 
@@ -234,12 +246,16 @@
             display: flex;
             align-items: center;
             gap: 9px;
-            transition: all 0.18s ease;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.18s ease;
+        }
+
+        .theme-btn:active {
+            transform: scale(0.985);
         }
 
         .theme-btn.active {
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.1);
+            border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+            background: rgba(224, 210, 184, 0.075);
         }
 
         .swatch {
@@ -250,8 +266,8 @@
         }
 
         .creator-box {
-            background: rgba(6, 9, 14, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(8, 11, 18, 0.76);
+            border: 1px solid rgba(224, 215, 198, 0.09);
             border-radius: 18px;
             padding: 15px;
             margin-bottom: 14px;
@@ -302,7 +318,7 @@
         .share-full-btn {
             width: 100%;
             background: var(--accent);
-            color: #090d16;
+            color: #14151a;
             border: none;
             padding: 13px;
             border-radius: 14px;
@@ -321,16 +337,16 @@
             top: calc(70px + env(safe-area-inset-top, 0px));
             left: 50%;
             transform: translateX(-50%) translateY(-15px);
-            background: rgba(15, 20, 30, 0.94);
+            background: rgba(19, 22, 32, 0.94);
             border: 1px solid var(--border);
-            color: #f8fafc;
+            color: #eee9df;
             padding: 8px 18px;
             border-radius: 30px;
             font-size: 0.78rem;
             font-weight: 600;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.25s ease;
+            transition: opacity 0.24s ease, transform 0.24s cubic-bezier(.2,.7,.2,1);
             z-index: 200;
             backdrop-filter: blur(10px);
         }
@@ -380,12 +396,12 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h3>SkyLight</h3>
-                <button class="close-x" onclick="closeModal('infoModal')">✕</button>
+                <button class="close-x" onclick="closeModal('infoModal')" aria-label="Close settings">✕</button>
             </div>
 
             <p class="vibe-desc">
                 Your own little pocket night sky ✨<br>
-                Swipe softly across stars to connect constellations and wake up soft harp notes. Hold on empty space (or use two fingers) to drift & zoom out across your cosmos—everything stays saved automatically.
+                Touch a star and gently sweep to another to connect them and wake up soft harp notes. Touch empty space to drift, or use two fingers to zoom across your infinite sky. Everything stays saved automatically.
             </p>
 
             <div class="section-label">Theme</div>
@@ -443,15 +459,16 @@
                 paired with Poisson minimum-distance rejection (`MIN_STAR_SEPARATION`).
               - Eliminates any grid or diagonal stripe artifacts.
 
-           3. ABSOLUTE TOUCH SEPARATION (NO ACCIDENTAL PAN/DRAW CONFLICTS):
-              - 1-Finger touch within 13px of a star = Weave Mode.
-              - 1-Finger touch on empty space = Pan Mode instantly.
-              - 2-Fingers = Pinch Zoom & Pan.
-              - Zero timers, zero lag, zero accidental background slipping!
+           3. BALANCED TOUCH SEPARATION (DIRECT STAR HIT VS EMPTY-SPACE PAN):
+              - 1-Finger touch within the balanced 26px star target = Weave Mode.
+              - Empty-space touch = direct Pan Mode; no delayed draw guessing.
+              - 2-Finger pinch zooms, then a remaining finger can continue panning.
+              - Coalesced pointer samples and 9px sweep steps help reliable snapping.
+              - A quiet target halo previews the next star without adding UI clutter.
 
-           4. LIVING INFINITE COSMOS (`Nebulae`, `Meteors` & `Shooting Stars`):
-              - Seeded nebula clouds sit on a slow parallax plane, so the backdrop
-                travels with the infinite world instead of remaining screen-fixed.
+           4. QUIET INFINITE COSMOS (CACHED NEBULAE, METEORS & SHOOTING STARS):
+              - Seeded nebula cells are cached once and stay static on a distant
+                parallax plane; occasional space objects move gently through it.
            ===================================================================== */
 
         // =====================================================================
@@ -472,7 +489,9 @@
             MIN_ZOOM: 0.08,             // Deep wide-angle zoom-out to view creations across space
             MAX_ZOOM: 1.0,              // Normal 1:1 close view
             DRAW_MIN_ZOOM: 0.30,        // Draw comfortably even when zoomed out
-            PAN_FRICTION: 0.85          // Smooth damped camera inertia
+            PAN_FRICTION: 0.85,         // Smooth damped camera inertia
+            ZOOM_EASE: 0.22,             // Gentle camera zoom interpolation
+            STAR_HOVER_RADIUS_PX: 19     // Subtle mouse-only star focus ring
         };
 
         // =====================================================================
@@ -481,55 +500,55 @@
         const THEMES = {
             white: {
                 name: 'White',
-                skyTop: '#000000',
-                skyMid: '#050810',
-                skyBot: '#0b111e',
-                haze: 'rgba(255, 255, 255, 0.04)',
-                accent: '#ffffff',
-                threadCore: 'rgba(255, 255, 255, 0.86)',
-                threadAura: 'rgba(226, 232, 240, 0.17)',
-                starRGB: '255, 255, 255',
-                hillFar: '#060a12',
-                hillNear: '#020408'
+                skyTop: '#06070c',
+                skyMid: '#0a0e18',
+                skyBot: '#111625',
+                haze: 'rgba(220, 207, 188, 0.026)',
+                accent: '#e9dfcf',
+                threadCore: 'rgba(246, 239, 226, 0.76)',
+                threadAura: 'rgba(216, 199, 174, 0.115)',
+                starRGB: '245, 239, 228',
+                hillFar: '#0b101a',
+                hillNear: '#080b13'
             },
             blue: {
                 name: 'Blue',
-                skyTop: '#000000',
-                skyMid: '#040914',
-                skyBot: '#09172b',
-                haze: 'rgba(125, 211, 252, 0.045)',
-                accent: '#7dd3fc',
-                threadCore: 'rgba(224, 242, 254, 0.86)',
-                threadAura: 'rgba(125, 211, 252, 0.19)',
-                starRGB: '186, 230, 253',
-                hillFar: '#060e1a',
-                hillNear: '#02060c'
+                skyTop: '#05070c',
+                skyMid: '#080e19',
+                skyBot: '#111d2d',
+                haze: 'rgba(139, 185, 207, 0.035)',
+                accent: '#9bc8dc',
+                threadCore: 'rgba(225, 239, 246, 0.76)',
+                threadAura: 'rgba(139, 185, 207, 0.12)',
+                starRGB: '205, 226, 236',
+                hillFar: '#0a111b',
+                hillNear: '#070b13'
             },
             pink: {
                 name: 'Pink',
-                skyTop: '#000000',
-                skyMid: '#0b050d',
-                skyBot: '#190c1e',
-                haze: 'rgba(249, 168, 212, 0.045)',
-                accent: '#f9a8d4',
-                threadCore: 'rgba(252, 231, 243, 0.86)',
-                threadAura: 'rgba(249, 168, 212, 0.19)',
-                starRGB: '251, 207, 232',
-                hillFar: '#110815',
-                hillNear: '#060208'
+                skyTop: '#08060c',
+                skyMid: '#110b16',
+                skyBot: '#1a1220',
+                haze: 'rgba(205, 158, 185, 0.032)',
+                accent: '#dbaec7',
+                threadCore: 'rgba(246, 226, 237, 0.76)',
+                threadAura: 'rgba(205, 158, 185, 0.12)',
+                starRGB: '235, 215, 228',
+                hillFar: '#120d18',
+                hillNear: '#0b0810'
             },
             gold: {
                 name: 'Gold',
-                skyTop: '#000000',
-                skyMid: '#090704',
-                skyBot: '#161108',
-                haze: 'rgba(253, 224, 71, 0.04)',
-                accent: '#fde047',
-                threadCore: 'rgba(254, 240, 195, 0.86)',
-                threadAura: 'rgba(253, 224, 71, 0.17)',
-                starRGB: '254, 240, 138',
-                hillFar: '#0f0b06',
-                hillNear: '#060402'
+                skyTop: '#08070a',
+                skyMid: '#100e0d',
+                skyBot: '#1b1711',
+                haze: 'rgba(210, 183, 132, 0.03)',
+                accent: '#d8c49b',
+                threadCore: 'rgba(244, 233, 209, 0.76)',
+                threadAura: 'rgba(210, 183, 132, 0.115)',
+                starRGB: '238, 225, 198',
+                hillFar: '#14110c',
+                hillNear: '#0b0907'
             }
         };
 
@@ -540,7 +559,7 @@
         // 3. VIEWPORT, CAMERA & WORLD STATE
         // =====================================================================
         const canvas = document.getElementById('skyCanvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
         let W = window.innerWidth;
         let H = window.innerHeight;
         let dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -555,6 +574,7 @@
         };
 
         const chunkCache = new Map();
+        const nebulaCache = new Map(); // Small LRU cache of pre-rendered, static nebula cells
         const savedStars = new Map();
         let edges = [];
         let undoStack = [];
@@ -899,6 +919,9 @@
         // 7. INPUT ENGINE: ABSOLUTE TOUCH SEPARATION (NO ACCIDENTAL DRAWING)
         // =====================================================================
         const activePointers = new Map();
+        let hoveredStar = null;
+        let snapPreviewStar = null;
+        let zoomAnchor = null;
 
         let gesture = {
             mode: 'none', // 'weave' | 'pan' | 'pinch'
@@ -909,6 +932,7 @@
             lastMoveY: 0,
             lastPanX: 0,
             lastPanY: 0,
+            lastPanTime: 0,
             lastPinchDist: 0,
             lastPinchMidX: 0,
             lastPinchMidY: 0
@@ -918,7 +942,7 @@
             return cam.zoom >= CONFIG.DRAW_MIN_ZOOM;
         }
 
-        function findNearestStarOnScreen(sx, sy, maxScreenPx = CONFIG.STAR_GRAB_RADIUS_PX) {
+        function findNearestStarOnScreen(sx, sy, maxScreenPx = CONFIG.STAR_GRAB_RADIUS_PX, eligibleOnly = false) {
             const wPt = screenToWorld(sx, sy);
             const cx = Math.floor(wPt.x / CONFIG.CHUNK_SIZE);
             const cy = Math.floor(wPt.y / CONFIG.CHUNK_SIZE);
@@ -930,6 +954,7 @@
                 for (let dx = -1; dx <= 1; dx++) {
                     const chunk = getChunk(cx + dx, cy + dy);
                     for (const s of chunk.stars) {
+                        if (eligibleOnly && getStarLinkCount(s.id) >= CONFIG.MAX_LINKS_PER_STAR) continue;
                         const sc = worldToScreen(s.x, s.y);
                         const d = Math.hypot(sc.x - sx, sc.y - sy);
                         if (d < bestScreenDist) {
@@ -943,7 +968,7 @@
         }
 
         function spawnScreenBurst(sx, sy, count = 10) {
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < Math.min(count, 10); i++) {
                 const ang = Math.random() * Math.PI * 2;
                 const spd = 0.3 + Math.random() * 1.4;
                 stardust.push({
@@ -952,10 +977,10 @@
                     vx: Math.cos(ang) * spd,
                     vy: Math.sin(ang) * spd,
                     r: 1.0 + Math.random() * 1.4,
-                    alpha: 0.85
+                    alpha: 0.34
                 });
             }
-            ripples.push({ sx, sy, r: 3, alpha: 0.65 });
+            ripples.push({ sx, sy, r: 3, alpha: 0.27 });
         }
 
         function tryLinkStars(starA, starB) {
@@ -997,37 +1022,33 @@
 
             const scB = worldToScreen(starB.x, starB.y);
             playSlowHarpNote(starB.freq);
-            spawnScreenBurst(scB.x, scB.y, 12);
+            spawnScreenBurst(scB.x, scB.y, 9);
             return true;
         }
 
         function weaveAlongSegment(x0, y0, x1, y1) {
             const dist = Math.hypot(x1 - x0, y1 - y0);
-            const steps = Math.max(1, Math.ceil(dist / 14));
+            // Smaller sampling gaps keep fast swipes from skipping stars between events.
+            const steps = Math.max(1, Math.ceil(dist / 9));
 
             for (let i = 1; i <= steps; i++) {
                 const t = i / steps;
                 const sx = x0 + (x1 - x0) * t;
                 const sy = y0 + (y1 - y0) * t;
-
-                const candidate = findNearestStarOnScreen(sx, sy, CONFIG.STAR_SNAP_RADIUS_PX);
+                const candidate = findNearestStarOnScreen(
+                    sx, sy, CONFIG.STAR_SNAP_RADIUS_PX, true
+                );
                 if (!candidate) continue;
 
                 if (!gesture.weavingStar) {
-                    if (getStarLinkCount(candidate.id) < CONFIG.MAX_LINKS_PER_STAR) {
-                        gesture.weavingStar = candidate;
-                        const sc = worldToScreen(candidate.x, candidate.y);
-                        playSlowHarpNote(candidate.freq);
-                        spawnScreenBurst(sc.x, sc.y, 8);
-                    }
+                    gesture.weavingStar = candidate;
+                    const sc = worldToScreen(candidate.x, candidate.y);
+                    playSlowHarpNote(candidate.freq);
+                    spawnScreenBurst(sc.x, sc.y, 6);
                 } else if (candidate.id !== gesture.weavingStar.id) {
-                    const linked = tryLinkStars(gesture.weavingStar, candidate);
-                    if (linked) {
-                        if (getStarLinkCount(candidate.id) < CONFIG.MAX_LINKS_PER_STAR) {
-                            gesture.weavingStar = candidate;
-                        } else {
-                            gesture.weavingStar = null;
-                        }
+                    if (tryLinkStars(gesture.weavingStar, candidate)) {
+                        gesture.weavingStar = getStarLinkCount(candidate.id) < CONFIG.MAX_LINKS_PER_STAR
+                            ? candidate : null;
                     }
                 }
             }
@@ -1035,9 +1056,14 @@
 
         canvas.addEventListener('pointerdown', e => {
             ensureAudio();
+            hoveredStar = null;
+            snapPreviewStar = null;
+            try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
             activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
             if (activePointers.size === 1) {
+                // A fresh one-finger gesture takes control from any unfinished wheel zoom anchor.
+                zoomAnchor = null;
                 cam.vx = 0;
                 cam.vy = 0;
                 gesture.lastMoveX = e.clientX;
@@ -1054,6 +1080,7 @@
                     gesture.weavingStar = null;
                     gesture.lastPanX = e.clientX;
                     gesture.lastPanY = e.clientY;
+                    gesture.lastPanTime = e.timeStamp;
                     return;
                 }
 
@@ -1072,10 +1099,14 @@
                     gesture.weavingStar = null;
                     gesture.lastPanX = e.clientX;
                     gesture.lastPanY = e.clientY;
+                    gesture.lastPanTime = e.timeStamp;
                 }
             } else if (activePointers.size === 2) {
+                cam.vx = 0;
+                cam.vy = 0;
                 gesture.mode = 'pinch';
                 gesture.weavingStar = null;
+                snapPreviewStar = null;
                 const pts = Array.from(activePointers.values());
                 gesture.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
                 gesture.lastPinchMidX = (pts[0].x + pts[1].x) * 0.5;
@@ -1084,9 +1115,48 @@
         });
 
         window.addEventListener('pointermove', e => {
-            if (!activePointers.has(e.pointerId)) return;
+            if (!activePointers.has(e.pointerId)) {
+                if (e.pointerType === 'mouse' && gesture.mode === 'none' && isDrawingZoomAllowed()) {
+                    const candidate = findNearestStarOnScreen(e.clientX, e.clientY, CONFIG.STAR_HOVER_RADIUS_PX, true);
+                    hoveredStar = candidate && getStarLinkCount(candidate.id) < CONFIG.MAX_LINKS_PER_STAR
+                        ? candidate : null;
+                }
+                return;
+            }
             activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
+            if (gesture.mode === 'weave' && activePointers.size === 1 && isDrawingZoomAllowed()) {
+                const coalesced = typeof e.getCoalescedEvents === 'function' ? e.getCoalescedEvents() : [];
+                const samples = coalesced && coalesced.length ? coalesced : [e];
+                let prevX = gesture.lastMoveX;
+                let prevY = gesture.lastMoveY;
+                for (const sample of samples) {
+                    const nextX = sample.clientX;
+                    const nextY = sample.clientY;
+                    if (Math.abs(nextX - prevX) + Math.abs(nextY - prevY) > 0.01) {
+                        weaveAlongSegment(prevX, prevY, nextX, nextY);
+                    }
+                    prevX = nextX;
+                    prevY = nextY;
+                }
+                if (Math.abs(e.clientX - prevX) + Math.abs(e.clientY - prevY) > 0.01) {
+                    weaveAlongSegment(prevX, prevY, e.clientX, e.clientY);
+                }
+                gesture.lastMoveX = e.clientX;
+                gesture.lastMoveY = e.clientY;
+                gesture.cursorScreenX = e.clientX;
+                gesture.cursorScreenY = e.clientY;
+                const preview = findNearestStarOnScreen(
+                    e.clientX, e.clientY, CONFIG.STAR_SNAP_RADIUS_PX, true
+                );
+                snapPreviewStar = preview && gesture.weavingStar &&
+                    preview.id !== gesture.weavingStar.id &&
+                    Math.hypot(preview.x - gesture.weavingStar.x, preview.y - gesture.weavingStar.y) <= CONFIG.MAX_LINK_WORLD_DIST
+                    ? preview : null;
+                return;
+            }
+
+            snapPreviewStar = null;
             const prevX = gesture.lastMoveX;
             const prevY = gesture.lastMoveY;
             gesture.lastMoveX = e.clientX;
@@ -1094,18 +1164,22 @@
             gesture.cursorScreenX = e.clientX;
             gesture.cursorScreenY = e.clientY;
 
-            if (gesture.mode === 'weave' && activePointers.size === 1 && isDrawingZoomAllowed()) {
-                weaveAlongSegment(prevX, prevY, e.clientX, e.clientY);
-            } else if (gesture.mode === 'pan' && activePointers.size === 1) {
-                const dx = (e.clientX - gesture.lastPanX) * 0.88;
-                const dy = (e.clientY - gesture.lastPanY) * 0.88;
+            if (gesture.mode === 'pan' && activePointers.size === 1) {
+                // Let the canvas track the finger directly; smooth only the release velocity.
+                const dx = e.clientX - gesture.lastPanX;
+                const dy = e.clientY - gesture.lastPanY;
                 gesture.lastPanX = e.clientX;
                 gesture.lastPanY = e.clientY;
 
                 cam.x -= dx / cam.zoom;
                 cam.y -= dy / cam.zoom;
-                cam.vx = (-dx / cam.zoom) * 0.65;
-                cam.vy = (-dy / cam.zoom) * 0.65;
+                const moveMs = Math.max(8, Math.min(50, e.timeStamp - gesture.lastPanTime));
+                const refreshScale = (1000 / 60) / moveMs;
+                gesture.lastPanTime = e.timeStamp;
+                const instantVX = Math.max(-70, Math.min(70, (-dx / cam.zoom) * refreshScale));
+                const instantVY = Math.max(-70, Math.min(70, (-dy / cam.zoom) * refreshScale));
+                cam.vx = cam.vx * 0.36 + instantVX * 0.64;
+                cam.vy = cam.vy * 0.36 + instantVY * 0.64;
             } else if (gesture.mode === 'pinch' && activePointers.size >= 2) {
                 const pts = Array.from(activePointers.values());
                 const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
@@ -1116,14 +1190,8 @@
                     const scale = dist / gesture.lastPinchDist;
                     const worldBefore = screenToWorld(midX, midY);
                     cam.targetZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, cam.targetZoom * scale));
-                    cam.zoom = cam.targetZoom;
-                    const worldAfter = screenToWorld(midX, midY);
-                    cam.x += (worldBefore.x - worldAfter.x);
-                    cam.y += (worldBefore.y - worldAfter.y);
+                    zoomAnchor = { worldX: worldBefore.x, worldY: worldBefore.y, screenX: midX, screenY: midY };
                 }
-
-                cam.x -= (midX - gesture.lastPinchMidX) / cam.zoom;
-                cam.y -= (midY - gesture.lastPinchMidY) / cam.zoom;
 
                 gesture.lastPinchDist = dist;
                 gesture.lastPinchMidX = midX;
@@ -1140,9 +1208,23 @@
                 }
                 gesture.mode = 'none';
                 gesture.weavingStar = null;
+                hoveredStar = null;
+                snapPreviewStar = null;
             } else if (activePointers.size === 1) {
-                gesture.mode = 'none';
+                const remaining = Array.from(activePointers.values())[0];
+                // After a pinch, the remaining finger becomes a pan gesture.
+                // It never resumes drawing mid-gesture.
+                gesture.mode = 'pan';
                 gesture.weavingStar = null;
+                gesture.lastMoveX = remaining.x;
+                gesture.lastMoveY = remaining.y;
+                gesture.lastPanX = remaining.x;
+                gesture.lastPanY = remaining.y;
+                gesture.lastPanTime = performance.now();
+                // The pinch midpoint no longer owns the camera once only one finger remains.
+                zoomAnchor = null;
+                cam.vx = 0;
+                cam.vy = 0;
             }
         }
 
@@ -1155,12 +1237,12 @@
             const factor = e.deltaY < 0 ? 1.12 : 0.89;
             const before = screenToWorld(e.clientX, e.clientY);
             cam.targetZoom = Math.max(CONFIG.MIN_ZOOM, Math.min(CONFIG.MAX_ZOOM, cam.targetZoom * factor));
-            cam.zoom = cam.targetZoom;
-            const after = screenToWorld(e.clientX, e.clientY);
-            cam.x += (before.x - after.x);
-            cam.y += (before.y - after.y);
+            zoomAnchor = { worldX: before.x, worldY: before.y, screenX: e.clientX, screenY: e.clientY };
             saveStateToStorage();
         }, { passive: false });
+        canvas.addEventListener('pointerleave', e => {
+            if (e.pointerType === 'mouse') hoveredStar = null;
+        });
 
         // =====================================================================
         // 8. THEME SWITCHER & DEEP-SPACE COMETS & METEORS
@@ -1184,48 +1266,186 @@
             showToast(theme.name);
         }
 
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
         function spawnShootingStar() {
-            if (document.hidden || shootingStars.length > 0) return;
+            if (prefersReducedMotion || document.hidden || shootingStars.length > 0) return;
+
+            // A few quiet entry directions keep the sky from feeling scripted.
+            const route = Math.floor(Math.random() * 3);
+            const speed = 3.8 + Math.random() * 2.0;
+            let sx, sy, angle;
+            if (route === 0) {
+                sx = W * (0.12 + Math.random() * 0.76);
+                sy = -24;
+                angle = 0.48 + Math.random() * 0.40;
+            } else if (route === 1) {
+                sx = -24;
+                sy = H * (0.12 + Math.random() * 0.48);
+                angle = -0.08 + Math.random() * 0.48;
+            } else {
+                sx = W + 24;
+                sy = H * (0.08 + Math.random() * 0.42);
+                angle = Math.PI - (0.08 + Math.random() * 0.48);
+            }
+
             shootingStars.push({
-                sx: W * (0.15 + Math.random() * 0.7),
-                sy: H * (0.08 + Math.random() * 0.28),
-                vx: 5.5 + Math.random() * 2.5,
-                vy: 2.2 + Math.random() * 1.5,
-                len: 65 + Math.random() * 30,
-                life: 1.0
+                sx, sy,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                len: 48 + Math.random() * 30,
+                life: 1.0,
+                decay: 0.011 + Math.random() * 0.004
             });
         }
 
         function spawnDeepSpaceMeteor() {
-            if (deepSpaceMeteors.length >= 2 || document.hidden) return;
+            if (prefersReducedMotion || deepSpaceMeteors.length >= 2 || document.hidden) return;
             const halfW = (W * 0.5) / cam.zoom;
             const halfH = (H * 0.5) / cam.zoom;
-            const angle = 0.18 + Math.random() * 0.28;
-            const speed = 1.2 + Math.random() * 0.8;
-            const fromTop = Math.random() < 0.35;
+            const side = Math.floor(Math.random() * 4);
+            const speed = 1.25 + Math.random() * 0.85;
+            const spread = (Math.random() - 0.5) * 0.62;
+            const baseAngles = [0, Math.PI, Math.PI * 0.5, -Math.PI * 0.5];
+            const angle = baseAngles[side] + spread;
+            const pad = 140;
+            let x, y;
+
+            if (side === 0) {
+                x = cam.x - halfW - pad;
+                y = cam.y + (Math.random() * 2 - 1) * halfH;
+            } else if (side === 1) {
+                x = cam.x + halfW + pad;
+                y = cam.y + (Math.random() * 2 - 1) * halfH;
+            } else if (side === 2) {
+                x = cam.x + (Math.random() * 2 - 1) * halfW;
+                y = cam.y - halfH - pad;
+            } else {
+                x = cam.x + (Math.random() * 2 - 1) * halfW;
+                y = cam.y + halfH + pad;
+            }
+
             deepSpaceMeteors.push({
-                x: fromTop ? cam.x + (Math.random() * 2 - 1) * halfW : cam.x - halfW - 100,
-                y: fromTop ? cam.y - halfH - 100 : cam.y + (Math.random() * 2 - 1) * halfH,
+                x, y,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                len: 90 + Math.random() * 80,
+                len: 70 + Math.random() * 65,
                 life: 1.0,
-                decay: 0.003 + Math.random() * 0.002
+                decay: 0.0028 + Math.random() * 0.0015
             });
         }
 
         // =====================================================================
         // 9. MAIN 60FPS RENDER LOOP (WITH LIVELY DEEP-SPACE METEORS)
         // =====================================================================
-        function renderFrame() {
+        function getNebulaCell(nx, ny, cellSize, cacheLimit, textureSize) {
+            const key = `${nx},${ny},${textureSize}`;
+            if (nebulaCache.has(key)) {
+                const cached = nebulaCache.get(key);
+                nebulaCache.delete(key);
+                nebulaCache.set(key, cached);
+                return cached;
+            }
+
+            let seed = Math.imul(nx ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(ny ^ 0xc2b2ae35, 0x27d4eb2d);
+            seed = Math.imul(seed ^ (seed >>> 16), 0x7feb352d);
+            seed = (seed ^ (seed >>> 15)) >>> 0;
+            const rand = () => {
+                seed = (seed + 0x6D2B79F5) >>> 0;
+                let value = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+                value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+                return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+            };
+
+            let cloud = null;
+            if (rand() >= 0.12) {
+                const colors = [
+                    [99, 88, 145], [57, 96, 137], [130, 83, 125],
+                    [55, 111, 112], [119, 91, 126]
+                ];
+                // Place each seeded cloud around its grid anchor with broad jitter.
+                // This guarantees nearby haze is present around the initial camera too.
+                const wx = (nx + (rand() - 0.5) * 0.56) * cellSize;
+                const wy = (ny + (rand() - 0.5) * 0.56) * cellSize;
+                const radius = 560 + rand() * 500;
+                const color = colors[Math.floor(rand() * colors.length)];
+                const texture = document.createElement('canvas');
+                const center = textureSize * 0.5;
+                const unit = textureSize / 160;
+                texture.width = texture.height = textureSize;
+                const nctx = texture.getContext('2d');
+
+                nctx.save();
+                nctx.translate(center, center);
+                nctx.rotate((rand() - 0.5) * 1.2);
+                nctx.scale(1.55, 0.78);
+                const mainRadius = 53 * unit;
+                const main = nctx.createRadialGradient(0, 0, 1.2 * unit, 0, 0, mainRadius);
+                main.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.17)`);
+                main.addColorStop(0.42, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.085)`);
+                main.addColorStop(0.76, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.027)`);
+                main.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                nctx.fillStyle = main;
+                nctx.fillRect(-mainRadius, -mainRadius, mainRadius * 2, mainRadius * 2);
+                nctx.restore();
+
+                const lobeX = center + (rand() - 0.5) * 76 * unit;
+                const lobeY = center + (rand() - 0.5) * 44 * unit;
+                const lobeRadius = (42 + rand() * 15) * unit;
+                const lobe = nctx.createRadialGradient(lobeX, lobeY, 0, lobeX, lobeY, lobeRadius);
+                lobe.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.105)`);
+                lobe.addColorStop(0.55, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.048)`);
+                lobe.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                nctx.fillStyle = lobe;
+                nctx.fillRect(lobeX - lobeRadius, lobeY - lobeRadius, lobeRadius * 2, lobeRadius * 2);
+
+                cloud = { canvas: texture, x: wx, y: wy, radius };
+            }
+
+            nebulaCache.set(key, cloud);
+            while (nebulaCache.size > cacheLimit) {
+                const oldestKey = nebulaCache.keys().next().value;
+                nebulaCache.delete(oldestKey);
+            }
+            return cloud;
+        }
+
+        let lastFrameTime = 0;
+
+        function renderFrame(frameTime = performance.now()) {
+            const elapsed = lastFrameTime ? Math.max(0, frameTime - lastFrameTime) : 1000 / 60;
+            const deltaMs = Math.min(50, elapsed || 1000 / 60);
+            const frameScale = deltaMs / (1000 / 60);
+            lastFrameTime = frameTime;
+
             ctx.clearRect(0, 0, W, H);
-            const tNow = performance.now() * 0.001;
+            const tNow = frameTime * 0.001;
+
+            // Ease zoom toward its target while keeping the chosen point under the fingers/cursor.
+            const zoomDiff = cam.targetZoom - cam.zoom;
+            if (Math.abs(zoomDiff) > 0.00025) {
+                const zoomStep = 1 - Math.pow(1 - CONFIG.ZOOM_EASE, frameScale);
+                cam.zoom += zoomDiff * zoomStep;
+                if (zoomAnchor) {
+                    cam.x = zoomAnchor.worldX - (zoomAnchor.screenX - W * 0.5) / cam.zoom;
+                    cam.y = zoomAnchor.worldY - (zoomAnchor.screenY - H * 0.5) / cam.zoom;
+                }
+            } else {
+                cam.zoom = cam.targetZoom;
+                if (zoomAnchor) {
+                    cam.x = zoomAnchor.worldX - (zoomAnchor.screenX - W * 0.5) / cam.zoom;
+                    cam.y = zoomAnchor.worldY - (zoomAnchor.screenY - H * 0.5) / cam.zoom;
+                    zoomAnchor = null;
+                    saveStateToStorage();
+                }
+            }
 
             if (gesture.mode !== 'pan' && gesture.mode !== 'pinch') {
-                cam.x += cam.vx;
-                cam.y += cam.vy;
-                cam.vx *= CONFIG.PAN_FRICTION;
-                cam.vy *= CONFIG.PAN_FRICTION;
+                cam.x += cam.vx * frameScale;
+                cam.y += cam.vy * frameScale;
+                const friction = Math.pow(CONFIG.PAN_FRICTION, frameScale);
+                cam.vx *= friction;
+                cam.vy *= friction;
                 if (Math.abs(cam.vx) * cam.zoom < 0.03) cam.vx = 0;
                 if (Math.abs(cam.vy) * cam.zoom < 0.03) cam.vy = 0;
             }
@@ -1240,71 +1460,42 @@
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, W, H);
 
-            // 2. Infinite, visible nebulae on a slow parallax plane.
-            // Each world cell has a deterministic seed, so clouds remain fixed
-            // in the universe while the camera moves. Larger overlapping lobes
-            // make the colour visible without competing with the drawable stars.
+            // 2. Quiet, infinite nebulae. Each cloud is rasterized once and reused;
+            //    it remains fixed to the distant parallax plane as the camera moves.
             const nebulaParallax = 0.20;
-            const nebulaCell = 2500;
-            const nebulaHalfW = (W * 0.5) / (cam.zoom * nebulaParallax);
-            const nebulaHalfH = (H * 0.5) / (cam.zoom * nebulaParallax);
+            const nebulaCell = 2200;
+            // The cloud centers are already expressed in nebula-plane world units.
+            // Only the camera offset is parallax-scaled; the visible half-viewport is not.
+            const nebulaHalfW = (W * 0.5) / cam.zoom;
+            const nebulaHalfH = (H * 0.5) / cam.zoom;
             const nebulaCamX = cam.x * nebulaParallax;
             const nebulaCamY = cam.y * nebulaParallax;
             const nMinX = Math.floor((nebulaCamX - nebulaHalfW) / nebulaCell) - 1;
             const nMaxX = Math.floor((nebulaCamX + nebulaHalfW) / nebulaCell) + 1;
             const nMinY = Math.floor((nebulaCamY - nebulaHalfH) / nebulaCell) - 1;
             const nMaxY = Math.floor((nebulaCamY + nebulaHalfH) / nebulaCell) + 1;
-            const nebulaColors = [
-                [105, 75, 205], [40, 112, 190], [165, 68, 150],
-                [30, 138, 145], [155, 105, 65]
-            ];
+            const totalNebulaCells = (nMaxX - nMinX + 1) * (nMaxY - nMinY + 1);
+            // Bound both draw count and retained canvas memory on small Android devices.
+            const nebulaStride = Math.max(1, Math.ceil(totalNebulaCells / 180));
+            const sampledNebulaCells = Math.ceil(totalNebulaCells / nebulaStride);
+            const nebulaCacheLimit = Math.min(204, Math.max(72, sampledNebulaCells + 16));
+            const nebulaTextureSize = totalNebulaCells > 1200 ? 96 : (totalNebulaCells > 500 ? 112 : 128);
+            while (nebulaCache.size > nebulaCacheLimit) {
+                nebulaCache.delete(nebulaCache.keys().next().value);
+            }
 
             for (let ny = nMinY; ny <= nMaxY; ny++) {
                 for (let nx = nMinX; nx <= nMaxX; nx++) {
-                    let seed = Math.imul(nx ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(ny ^ 0xc2b2ae35, 0x27d4eb2d);
-                    seed = Math.imul(seed ^ (seed >>> 16), 0x7feb352d);
-                    seed = (seed ^ (seed >>> 15)) >>> 0;
-                    const randN = () => {
-                        seed = (seed + 0x6D2B79F5) >>> 0;
-                        let v = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-                        v = (v + Math.imul(v ^ (v >>> 7), 61 | v)) ^ v;
-                        return ((v ^ (v >>> 14)) >>> 0) / 4294967296;
-                    };
-                    if (randN() < 0.12) continue;
-
-                    const wx = (nx + 0.12 + randN() * 0.76) * nebulaCell;
-                    const wy = (ny + 0.12 + randN() * 0.76) * nebulaCell;
-                    const radius = 1250 + randN() * 950;
-                    const color = nebulaColors[Math.floor(randN() * nebulaColors.length)];
-                    const sx = (wx - nebulaCamX) * cam.zoom + W * 0.5;
-                    const sy = (wy - nebulaCamY) * cam.zoom + H * 0.5;
-                    const r = radius * cam.zoom;
-                    if (sx < -r * 1.8 || sx > W + r * 1.8 || sy < -r * 1.8 || sy > H + r * 1.8) continue;
-
-                    // Main cloud: broad, softly stretched colour rather than a round orb.
-                    ctx.save();
-                    ctx.translate(sx, sy);
-                    ctx.rotate((randN() - 0.5) * 1.2);
-                    ctx.scale(1.55, 0.78);
-                    const cloud = ctx.createRadialGradient(0, 0, r * 0.04, 0, 0, r);
-                    cloud.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.19)`);
-                    cloud.addColorStop(0.42, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.105)`);
-                    cloud.addColorStop(0.76, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.035)`);
-                    cloud.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`);
-                    ctx.fillStyle = cloud;
-                    ctx.fillRect(-r, -r, r * 2, r * 2);
-                    ctx.restore();
-
-                    // Two offset lobes break up the oval into a soft nebula shape.
-                    const lobeX = sx + (randN() - 0.5) * r * 0.95;
-                    const lobeY = sy + (randN() - 0.5) * r * 0.55;
-                    const lobeR = r * (0.48 + randN() * 0.18);
-                    const lobe = ctx.createRadialGradient(lobeX, lobeY, 0, lobeX, lobeY, lobeR);
-                    lobe.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.12)`);
-                    lobe.addColorStop(0.55, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.055)`);
-                    lobe.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`);
-                    ctx.fillStyle = lobe;
-                    ctx.fillRect(lobeX - lobeR, lobeY - lobeR, lobeR * 2, lobeR * 2);
+                    if (nebulaStride > 1 && Math.abs((nx * 31 + ny * 17) % nebulaStride) !== 0) continue;
+                    const cloud = getNebulaCell(nx, ny, nebulaCell, nebulaCacheLimit, nebulaTextureSize);
+                    if (!cloud) continue;
+                    const sx = (cloud.x - nebulaCamX) * cam.zoom + W * 0.5;
+                    const sy = (cloud.y - nebulaCamY) * cam.zoom + H * 0.5;
+                    const r = cloud.radius * cam.zoom;
+                    const drawW = r * 3.5;
+                    const drawH = r * 1.78;
+                    if (sx < -drawW || sx > W + drawW || sy < -drawH || sy > H + drawH) continue;
+                    ctx.drawImage(cloud.canvas, sx - drawW * 0.5, sy - drawH * 0.5, drawW, drawH);
                 }
             }
 
@@ -1325,8 +1516,8 @@
                         for (const d of chunk.dust) {
                             const sc = worldToScreen(d.x, d.y);
                             if (sc.x < -10 || sc.x > W + 10 || sc.y < -10 || sc.y > H + 10) continue;
-                            const twinkle = d.alpha * dustFade * (0.55 + 0.45 * Math.sin(tNow * 1.1 + d.phase));
-                            ctx.fillStyle = `rgba(226, 232, 240, ${twinkle})`;
+                            const twinkle = d.alpha * dustFade * (0.62 + 0.38 * Math.sin(tNow * 0.9 + d.phase));
+                            ctx.fillStyle = `rgba(${theme.starRGB}, ${twinkle * 0.84})`;
                             ctx.beginPath();
                             ctx.arc(sc.x, sc.y, d.r * zScale, 0, Math.PI * 2);
                             ctx.fill();
@@ -1340,18 +1531,22 @@
             ctx.lineWidth = 1.0;
             for (let i = deepSpaceMeteors.length - 1; i >= 0; i--) {
                 const m = deepSpaceMeteors[i];
-                m.x += m.vx;
-                m.y += m.vy;
-                m.life -= m.decay;
+                m.x += m.vx * frameScale;
+                m.y += m.vy * frameScale;
+                m.life -= m.decay * frameScale;
                 if (m.life <= 0) {
                     deepSpaceMeteors.splice(i, 1);
                     continue;
                 }
                 const head = worldToScreen(m.x, m.y);
-                const tail = worldToScreen(m.x - m.vx * (m.len / m.vx), m.y - m.vy * (m.len / m.vy));
+                const speedLength = Math.hypot(m.vx, m.vy) || 1;
+                const tail = worldToScreen(
+                    m.x - (m.vx / speedLength) * m.len,
+                    m.y - (m.vy / speedLength) * m.len
+                );
                 const mg = ctx.createLinearGradient(head.x, head.y, tail.x, tail.y);
-                mg.addColorStop(0, `rgba(255, 255, 255, ${m.life * 0.45})`);
-                mg.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                mg.addColorStop(0, `rgba(232, 222, 207, ${m.life * 0.24})`);
+                mg.addColorStop(1, 'rgba(232, 222, 207, 0)');
                 ctx.strokeStyle = mg;
                 ctx.beginPath();
                 ctx.moveTo(head.x, head.y);
@@ -1363,9 +1558,9 @@
             // 6. Shooting Stars
             for (let i = shootingStars.length - 1; i >= 0; i--) {
                 const ss = shootingStars[i];
-                ss.sx += ss.vx;
-                ss.sy += ss.vy;
-                ss.life -= 0.014;
+                ss.sx += ss.vx * frameScale;
+                ss.sy += ss.vy * frameScale;
+                ss.life -= ss.decay * frameScale;
                 if (ss.life <= 0) {
                     shootingStars.splice(i, 1);
                     continue;
@@ -1373,10 +1568,10 @@
                 const tx = ss.sx - (ss.vx / 7) * ss.len;
                 const ty = ss.sy - (ss.vy / 7) * ss.len;
                 const g = ctx.createLinearGradient(ss.sx, ss.sy, tx, ty);
-                g.addColorStop(0, `rgba(248, 250, 252, ${ss.life * 0.75})`);
-                g.addColorStop(1, 'rgba(248, 250, 252, 0)');
+                g.addColorStop(0, `rgba(238, 231, 218, ${ss.life * 0.38})`);
+                g.addColorStop(1, 'rgba(238, 231, 218, 0)');
                 ctx.strokeStyle = g;
-                ctx.lineWidth = 1.3;
+                ctx.lineWidth = 1.0;
                 ctx.beginPath();
                 ctx.moveTo(ss.sx, ss.sy);
                 ctx.lineTo(tx, ty);
@@ -1386,19 +1581,20 @@
             // 7. Drawn Constellation Threads
             ctx.save();
             ctx.lineCap = 'round';
-            const auraWidth = Math.max(1.8, 5.5 * zScale);
-            const coreWidth = Math.max(0.75, 1.45 * zScale);
+            const auraWidth = Math.max(1.5, 4.4 * zScale);
+            const coreWidth = Math.max(0.72, 1.30 * zScale);
 
             for (const e of edges) {
                 const sA = savedStars.get(e.aId);
                 const sB = savedStars.get(e.bId);
                 if (!sA || !sB) continue;
 
-                e.anim = Math.min(1, e.anim + 0.08);
+                e.anim = Math.min(1, e.anim + 0.06 * frameScale);
+                const reveal = 1 - Math.pow(1 - e.anim, 2);
                 const pA = worldToScreen(sA.x, sA.y);
                 const pB = worldToScreen(
-                    sA.x + (sB.x - sA.x) * e.anim,
-                    sA.y + (sB.y - sA.y) * e.anim
+                    sA.x + (sB.x - sA.x) * reveal,
+                    sA.y + (sB.y - sA.y) * reveal
                 );
 
                 if ((pA.x < -60 && pB.x < -60) || (pA.x > W + 60 && pB.x > W + 60) ||
@@ -1419,6 +1615,14 @@
                 ctx.moveTo(pA.x, pA.y);
                 ctx.lineTo(pB.x, pB.y);
                 ctx.stroke();
+
+                // A dim, short-lived light point follows the line as it is drawn.
+                if (e.anim < 1) {
+                    ctx.fillStyle = `rgba(${theme.starRGB}, ${(1 - e.anim) * 0.14})`;
+                    ctx.beginPath();
+                    ctx.arc(pB.x, pB.y, Math.max(1.1, 2.2 * zScale), 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
             ctx.restore();
 
@@ -1428,19 +1632,21 @@
 
                 ctx.save();
                 ctx.setLineDash([3, 7]);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.strokeStyle = 'rgba(225, 213, 193, 0.075)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.arc(pStart.x, pStart.y, CONFIG.MAX_LINK_WORLD_DIST * cam.zoom, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.restore();
 
+                ctx.globalAlpha = 0.56;
                 ctx.strokeStyle = theme.threadCore;
                 ctx.lineWidth = coreWidth;
                 ctx.beginPath();
                 ctx.moveTo(pStart.x, pStart.y);
                 ctx.lineTo(gesture.cursorScreenX, gesture.cursorScreenY);
                 ctx.stroke();
+                ctx.globalAlpha = 1;
             }
 
             // 9. Draw Organic Stars
@@ -1460,12 +1666,15 @@
                         if (sc.x < -30 || sc.x > W + 30 || sc.y < -30 || sc.y > H + 30) continue;
 
                         const isWeavingFrom = gesture.mode === 'weave' && gesture.weavingStar && gesture.weavingStar.id === s.id;
-                        const breath = 0.85 + 0.15 * Math.sin(tNow * 1.6 + s.phase);
+                        const isHovered = hoveredStar && hoveredStar.id === s.id && gesture.mode === 'none';
+                        const isSnapPreview = gesture.mode === 'weave' && snapPreviewStar && snapPreviewStar.id === s.id;
+                        const depth = Math.max(0, Math.min(1, (s.baseR - 2.2) / 1.5));
+                        const breath = 0.945 + 0.055 * Math.sin(tNow * 0.92 + s.phase);
 
-                        const haloR = (links > 0 || isWeavingFrom ? 15.5 : 9.0) * breath * zScale;
-                        if (haloR >= 2.0 && (links > 0 || isWeavingFrom || cam.zoom >= 0.22)) {
+                        const haloR = (links > 0 || isWeavingFrom || isHovered || isSnapPreview ? 12.2 : 8.2) * (0.94 + depth * 0.08) * breath * zScale;
+                        if (haloR >= 2.0 && (links > 0 || isWeavingFrom || isHovered || isSnapPreview || cam.zoom >= 0.22)) {
                             const halo = ctx.createRadialGradient(sc.x, sc.y, 0.3, sc.x, sc.y, haloR);
-                            const baseAlpha = isWeavingFrom ? 0.58 : (links > 0 ? 0.42 : 0.18 * unlinkedAlphaBoost);
+                            const baseAlpha = isWeavingFrom ? 0.29 : (isSnapPreview ? 0.20 : (isHovered ? 0.19 : (links > 0 ? 0.25 : 0.115 * unlinkedAlphaBoost)));
                             halo.addColorStop(0, `rgba(${theme.starRGB}, ${baseAlpha})`);
                             halo.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
@@ -1476,8 +1685,8 @@
                         }
 
                         if (links > 0 || isWeavingFrom) {
-                            const fLen = Math.max(2.6, (6.5 + Math.min(links, 3) * 1.1) * breath * zScale);
-                            ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(0.9, 0.58 + links * 0.08)})`;
+                            const fLen = Math.max(2.4, (5.8 + Math.min(links, 3) * 0.9) * breath * zScale);
+                            ctx.strokeStyle = `rgba(${theme.starRGB}, ${Math.min(0.62, 0.36 + links * 0.045)})`;
                             ctx.lineWidth = Math.max(0.65, 1.0 * zScale);
                             ctx.beginPath();
                             ctx.moveTo(sc.x - fLen, sc.y);
@@ -1487,11 +1696,26 @@
                             ctx.stroke();
                         }
 
-                        const coreR = Math.max(0.85, s.baseR * (links > 0 ? 1.15 : 0.9) * zScale);
-                        ctx.fillStyle = links > 0 ? '#ffffff' : `rgba(241, 245, 249, ${0.80 * unlinkedAlphaBoost})`;
+                        const coreR = Math.max(0.78, s.baseR * (links > 0 ? 1.10 : 0.88) * zScale);
+                        ctx.fillStyle = links > 0 ? `rgba(${theme.starRGB}, 0.91)` : `rgba(${theme.starRGB}, ${(0.64 + depth * 0.10) * unlinkedAlphaBoost})`;
                         ctx.beginPath();
                         ctx.arc(sc.x, sc.y, coreR, 0, Math.PI * 2);
                         ctx.fill();
+
+                        if (isWeavingFrom || isHovered) {
+                            ctx.strokeStyle = `rgba(${theme.starRGB}, ${isWeavingFrom ? 0.20 : 0.15})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.beginPath();
+                            ctx.arc(sc.x, sc.y, coreR + 3.2 * zScale, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                        if (isSnapPreview) {
+                            ctx.strokeStyle = `rgba(${theme.starRGB}, 0.20)`;
+                            ctx.lineWidth = 0.9;
+                            ctx.beginPath();
+                            ctx.arc(sc.x, sc.y, coreR + 6.6 * zScale, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
                     }
                 }
             }
@@ -1499,8 +1723,8 @@
             // 10. Ripples & Stardust
             for (let i = ripples.length - 1; i >= 0; i--) {
                 const rp = ripples[i];
-                rp.r += 0.9;
-                rp.alpha -= 0.018;
+                rp.r += 0.9 * frameScale;
+                rp.alpha -= 0.018 * frameScale;
                 if (rp.alpha <= 0) {
                     ripples.splice(i, 1);
                     continue;
@@ -1514,9 +1738,9 @@
 
             for (let i = stardust.length - 1; i >= 0; i--) {
                 const sd = stardust[i];
-                sd.sx += sd.vx;
-                sd.sy += sd.vy;
-                sd.alpha -= 0.018;
+                sd.sx += sd.vx * frameScale;
+                sd.sy += sd.vy * frameScale;
+                sd.alpha -= 0.018 * frameScale;
                 if (sd.alpha <= 0) {
                     stardust.splice(i, 1);
                     continue;
@@ -1527,36 +1751,23 @@
                 ctx.fill();
             }
 
-            // 11. Bottom Horizon Silhouette
-            drawSoftHorizon();
+            // 11. Soft edge vignette. No horizon line, so the sky stays endless.
+            drawSoftVignette();
 
             if (!document.hidden) rafId = requestAnimationFrame(renderFrame);
         }
 
-        function drawSoftHorizon() {
-            const baseH = H - 22;
-            ctx.fillStyle = theme.hillFar;
-            ctx.beginPath();
-            ctx.moveTo(0, H);
-            for (let sx = 0; sx <= W + 24; sx += 24) {
-                const hOff = Math.sin(sx * 0.004) * 12 + Math.cos(sx * 0.009) * 6;
-                ctx.lineTo(sx, baseH - 6 - hOff);
-            }
-            ctx.lineTo(W, H);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.fillStyle = theme.hillNear;
-            ctx.beginPath();
-            ctx.moveTo(0, H);
-            for (let sx = 0; sx <= W + 24; sx += 24) {
-                const hOff = Math.sin(sx * 0.006 + 1.7) * 7 + Math.cos(sx * 0.012) * 3;
-                ctx.lineTo(sx, baseH + 4 - hOff);
-            }
-            ctx.lineTo(W, H);
-            ctx.closePath();
-            ctx.fl_l = true;
-            ctx.fill();
+        function drawSoftVignette() {
+            const radius = Math.max(W, H) * 0.82;
+            const vignette = ctx.createRadialGradient(
+                W * 0.5, H * 0.46, Math.min(W, H) * 0.16,
+                W * 0.5, H * 0.46, radius
+            );
+            vignette.addColorStop(0, 'rgba(3, 4, 9, 0)');
+            vignette.addColorStop(0.72, 'rgba(3, 4, 9, 0.025)');
+            vignette.addColorStop(1, 'rgba(3, 4, 9, 0.14)');
+            ctx.fillStyle = vignette;
+            ctx.fillRect(0, 0, W, H);
         }
 
         function resize() {
@@ -1567,6 +1778,8 @@
             canvas.width = W * dpr;
             canvas.height = H * dpr;
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
         }
 
         // =====================================================================
@@ -1628,8 +1841,10 @@
             if (document.hidden) {
                 cancelAnimationFrame(rafId);
                 rafId = 0;
+                lastFrameTime = 0;
                 writeStateToStorage();
             } else if (!rafId) {
+                lastFrameTime = 0;
                 rafId = requestAnimationFrame(renderFrame);
             }
         });
