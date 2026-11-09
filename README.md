@@ -46,7 +46,6 @@
 
 ## 💖 Credits & Support
 
-Crafted with care by **Prasanna** (`@prasannaone`). 
+Crafted with care by **Prasanna**
 
-* **GitHub**: [PrasannaOne/SkyLight](https://github.com/PrasannaOne/SkyLight)
 * **Telegram**: [@prasannaone](https://t.me/prasannaone)
