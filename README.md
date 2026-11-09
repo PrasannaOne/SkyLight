@@ -1,4 +1,4 @@
-# <div align="center"> <a href="https://prasannaone.github.io/SkyLight/"><h1>✨ SkyLight ✨</h1></a> </div>
+### <div align="center"> <a href="https://prasannaone.github.io/SkyLight/"><h1>✨ SkyLight ✨</h1></a> </div>
 
 <div align="center">
 
