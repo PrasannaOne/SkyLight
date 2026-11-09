@@ -444,14 +444,14 @@
               - Eliminates any grid or diagonal stripe artifacts.
 
            3. ABSOLUTE TOUCH SEPARATION (NO ACCIDENTAL PAN/DRAW CONFLICTS):
-              - 1-Finger touch on a star (`STAR_GRAB_RADIUS_PX = 46`) = 100% Weave Mode.
-              - 1-Finger touch on empty space = 100% Pan Mode instantly.
+              - 1-Finger touch within 13px of a star = Weave Mode.
+              - 1-Finger touch on empty space = Pan Mode instantly.
               - 2-Fingers = Pinch Zoom & Pan.
               - Zero timers, zero lag, zero accidental background slipping!
 
-           4. LIVELY INFINITE COSMOS (`Deep-Space Meteors & Shooting Stars`):
-              - Frequent, smooth shooting stars and continuous deep-space meteors
-                gliding quietly across the background to give a true living universe feel.
+           4. LIVING INFINITE COSMOS (`Nebulae`, `Meteors` & `Shooting Stars`):
+              - Seeded nebula clouds sit on a slow parallax plane, so the backdrop
+                travels with the infinite world instead of remaining screen-fixed.
            ===================================================================== */
 
         // =====================================================================
@@ -467,7 +467,7 @@
             STARS_PER_CHUNK: 11,        // Organically spaced stars per sector
             MIN_STAR_SEPARATION: 102,   // Minimum world distance between stars in a chunk
             MAX_LINK_WORLD_DIST: 420,   // Generous reach so neighbor stars always connect
-            STAR_GRAB_RADIUS_PX: 46,    // Generous grab radius so hitting a star is effortless
+            STAR_GRAB_RADIUS_PX: 26,    // Comfortable touch target without grabbing stars from too far away
             STAR_SNAP_RADIUS_PX: 42,    // Screen snap radius when swiping onto next star
             MIN_ZOOM: 0.08,             // Deep wide-angle zoom-out to view creations across space
             MAX_ZOOM: 1.0,              // Normal 1:1 close view
@@ -1057,7 +1057,8 @@
                     return;
                 }
 
-                const hitStar = findNearestStarOnScreen(e.clientX, e.clientY, CONFIG.STAR_GRAB_RADIUS_PX);
+                const hitRadius = e.pointerType === 'touch' ? CONFIG.STAR_GRAB_RADIUS_PX : 19;
+                const hitStar = findNearestStarOnScreen(e.clientX, e.clientY, hitRadius);
 
                 if (hitStar && getStarLinkCount(hitStar.id) < CONFIG.MAX_LINKS_PER_STAR) {
                     gesture.mode = 'weave';
@@ -1239,26 +1240,73 @@
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, W, H);
 
-            // 2. Soft Veiled Atmospheric Moon Glow
-            const moonScreenX = W * 0.78;
-            const moonScreenY = H * 0.19;
-            const outerMoonHaze = ctx.createRadialGradient(moonScreenX, moonScreenY, 4, moonScreenX, moonScreenY, 210);
-            outerMoonHaze.addColorStop(0, 'rgba(248, 250, 252, 0.10)');
-            outerMoonHaze.addColorStop(0.35, theme.haze);
-            outerMoonHaze.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = outerMoonHaze;
-            ctx.beginPath();
-            ctx.arc(moonScreenX, moonScreenY, 210, 0, Math.PI * 2);
-            ctx.fill();
+            // 2. Infinite, visible nebulae on a slow parallax plane.
+            // Each world cell has a deterministic seed, so clouds remain fixed
+            // in the universe while the camera moves. Larger overlapping lobes
+            // make the colour visible without competing with the drawable stars.
+            const nebulaParallax = 0.20;
+            const nebulaCell = 2500;
+            const nebulaHalfW = (W * 0.5) / (cam.zoom * nebulaParallax);
+            const nebulaHalfH = (H * 0.5) / (cam.zoom * nebulaParallax);
+            const nebulaCamX = cam.x * nebulaParallax;
+            const nebulaCamY = cam.y * nebulaParallax;
+            const nMinX = Math.floor((nebulaCamX - nebulaHalfW) / nebulaCell) - 1;
+            const nMaxX = Math.floor((nebulaCamX + nebulaHalfW) / nebulaCell) + 1;
+            const nMinY = Math.floor((nebulaCamY - nebulaHalfH) / nebulaCell) - 1;
+            const nMaxY = Math.floor((nebulaCamY + nebulaHalfH) / nebulaCell) + 1;
+            const nebulaColors = [
+                [105, 75, 205], [40, 112, 190], [165, 68, 150],
+                [30, 138, 145], [155, 105, 65]
+            ];
 
-            const innerOrb = ctx.createRadialGradient(moonScreenX, moonScreenY, 1, moonScreenX, moonScreenY, 17);
-            innerOrb.addColorStop(0, 'rgba(255, 255, 255, 0.52)');
-            innerOrb.addColorStop(0.55, 'rgba(241, 245, 249, 0.16)');
-            innerOrb.addColorStop(1, 'rgba(241, 245, 249, 0)');
-            ctx.fillStyle = innerOrb;
-            ctx.beginPath();
-            ctx.arc(moonScreenX, moonScreenY, 17, 0, Math.PI * 2);
-            ctx.fill();
+            for (let ny = nMinY; ny <= nMaxY; ny++) {
+                for (let nx = nMinX; nx <= nMaxX; nx++) {
+                    let seed = Math.imul(nx ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(ny ^ 0xc2b2ae35, 0x27d4eb2d);
+                    seed = Math.imul(seed ^ (seed >>> 16), 0x7feb352d);
+                    seed = (seed ^ (seed >>> 15)) >>> 0;
+                    const randN = () => {
+                        seed = (seed + 0x6D2B79F5) >>> 0;
+                        let v = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+                        v = (v + Math.imul(v ^ (v >>> 7), 61 | v)) ^ v;
+                        return ((v ^ (v >>> 14)) >>> 0) / 4294967296;
+                    };
+                    if (randN() < 0.12) continue;
+
+                    const wx = (nx + 0.12 + randN() * 0.76) * nebulaCell;
+                    const wy = (ny + 0.12 + randN() * 0.76) * nebulaCell;
+                    const radius = 1250 + randN() * 950;
+                    const color = nebulaColors[Math.floor(randN() * nebulaColors.length)];
+                    const sx = (wx - nebulaCamX) * cam.zoom + W * 0.5;
+                    const sy = (wy - nebulaCamY) * cam.zoom + H * 0.5;
+                    const r = radius * cam.zoom;
+                    if (sx < -r * 1.8 || sx > W + r * 1.8 || sy < -r * 1.8 || sy > H + r * 1.8) continue;
+
+                    // Main cloud: broad, softly stretched colour rather than a round orb.
+                    ctx.save();
+                    ctx.translate(sx, sy);
+                    ctx.rotate((randN() - 0.5) * 1.2);
+                    ctx.scale(1.55, 0.78);
+                    const cloud = ctx.createRadialGradient(0, 0, r * 0.04, 0, 0, r);
+                    cloud.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.19)`);
+                    cloud.addColorStop(0.42, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.105)`);
+                    cloud.addColorStop(0.76, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.035)`);
+                    cloud.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`);
+                    ctx.fillStyle = cloud;
+                    ctx.fillRect(-r, -r, r * 2, r * 2);
+                    ctx.restore();
+
+                    // Two offset lobes break up the oval into a soft nebula shape.
+                    const lobeX = sx + (randN() - 0.5) * r * 0.95;
+                    const lobeY = sy + (randN() - 0.5) * r * 0.55;
+                    const lobeR = r * (0.48 + randN() * 0.18);
+                    const lobe = ctx.createRadialGradient(lobeX, lobeY, 0, lobeX, lobeY, lobeR);
+                    lobe.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.12)`);
+                    lobe.addColorStop(0.55, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.055)`);
+                    lobe.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`);
+                    ctx.fillStyle = lobe;
+                    ctx.fillRect(lobeX - lobeR, lobeY - lobeR, lobeR * 2, lobeR * 2);
+                }
+            }
 
             // 3. Visible World Chunks
             const halfW = (W * 0.5) / cam.zoom;
