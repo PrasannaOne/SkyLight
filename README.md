@@ -2,9 +2,6 @@
 
 <div align="center">
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-7dd3fc?style=for-the-badge&logo=rocket&logoColor=black)](https://prasannaone.github.io/SkyLight/)
-[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-ffffff?style=for-the-badge&logo=github&logoColor=black)](https://github.com/PrasannaOne/SkyLight)
-[![Crafted with Love](https://img.shields.io/badge/Crafted_by-Prasanna_♥️-f472b6?style=for-the-badge)](https://t.me/prasannaone)
 
 **A cozy, infinite pocket night sky where you weave glowing constellations to slow acoustic harp notes.**
 
