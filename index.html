@@ -381,6 +381,21 @@
         }
 
 
+
+        /* --- PWA UPDATE PROMPT --- */
+        .pwa-update {
+            position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+            transform: translate(-50%, 14px); width: min( calc(100% - 32px), 360px);
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px; border: 1px solid var(--border); border-radius: 18px;
+            background: rgba(16, 17, 30, 0.96); color: var(--text);
+            box-shadow: 0 12px 36px rgba(0,0,0,.38); backdrop-filter: blur(16px);
+            opacity: 0; pointer-events: none; transition: opacity .22s ease, transform .22s ease; z-index: 500;
+        }
+        .pwa-update.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+        .pwa-update span { flex: 1; font-size: .82rem; line-height: 1.35; }
+        .pwa-update button { border: 0; border-radius: 12px; padding: 9px 13px; background: #cbb7ff; color: #171020; font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; }
+
         /* --- 6. REFINED INTERFACE FINISH --- */
         :root {
             --bg: #070711;
@@ -752,6 +767,11 @@
     </div>
 
     <div class="toast" id="toast">Saved</div>
+    <div class="pwa-update" id="pwaUpdate" role="status" aria-live="polite">
+        <span>A new SkyLight is ready.</span>
+        <button type="button" id="pwaUpdateButton">Update</button>
+    </div>
+
 
     <script>
         /* =====================================================================
@@ -2474,9 +2494,64 @@
             if (Math.random() < 0.68) spawnDeepSpaceMeteor();
         }, 9000);
         rafId = requestAnimationFrame(renderFrame);
+        // PWA updates: check quietly, let the user choose when to reload, and
+        // never interrupt an active drawing session without consent.
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            let waitingWorker = null;
+            let updateRegistration = null;
+            let reloadingForUpdate = false;
+            const updatePrompt = document.getElementById('pwaUpdate');
+            const updateButton = document.getElementById('pwaUpdateButton');
+
+            function showPwaUpdate(worker) {
+                waitingWorker = worker;
+                updatePrompt.classList.add('show');
+            }
+
+            function watchPwaRegistration(registration) {
+                updateRegistration = registration;
+                if (registration.waiting && navigator.serviceWorker.controller) {
+                    showPwaUpdate(registration.waiting);
+                }
+                registration.addEventListener('updatefound', () => {
+                    const installing = registration.installing;
+                    if (!installing) return;
+                    installing.addEventListener('statechange', () => {
+                        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+                            showPwaUpdate(installing);
+                        }
+                    });
+                });
+            }
+
+            updateButton.addEventListener('click', () => {
+                if (!waitingWorker) return;
+                updateButton.disabled = true;
+                updateButton.textContent = 'Updating…';
+                waitingWorker.postMessage({ type: 'SKYLIGHT_SKIP_WAITING' });
+            });
+
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (reloadingForUpdate) return;
+                reloadingForUpdate = true;
+                window.location.reload();
+            });
+
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+                    watchPwaRegistration(registration);
+                    // Check on launch, then periodically while the app is open.
+                    registration.update().catch(() => {});
+                    window.setInterval(() => {
+                        if (!document.hidden) registration.update().catch(() => {});
+                    }, 60 * 60 * 1000);
+                    document.addEventListener('visibilitychange', () => {
+                        if (!document.hidden && updateRegistration) updateRegistration.update().catch(() => {});
+                    });
+                } catch (error) {
+                    // The web app remains fully usable if service workers are unavailable.
+                }
             });
         }
     </script>
