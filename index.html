@@ -6,24 +6,23 @@
     <meta name="theme-color" content="#070711">
     <meta name="description" content="Where stars meet. Weave glowing constellations in your own infinite night sky.">
     <meta name="color-scheme" content="dark">
-    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230d0c1b'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Arial,sans-serif' font-size='39' font-weight='700' fill='%23d8c9f3'%3ES%3C/text%3E%3C/svg%3E">
     <title>SkyLight | Where stars meet.</title>
     <meta name="application-name" content="SkyLight">
     <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="./skylight-icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="SkyLight">
-    <meta property="og:url" content="https://prasannaone.github.io/SkyLight/">
     <meta property="og:title" content="SkyLight | Where stars meet.">
     <meta property="og:description" content="A quiet, infinite night sky. Weave glowing constellations and make the universe your own.">
     <meta property="og:image" content="https://prasannaone.github.io/SkyLight/skylight-preview.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="SkyLight, Where stars meet. A glowing heart-shaped constellation in a deep purple night sky.">
+    <meta property="og:image:alt" content="SkyLight, Where stars meet. A glowing heart-shaped constellation in a deep night sky.">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SkyLight | Where stars meet.">
     <meta name="twitter:description" content="A quiet, infinite night sky for weaving glowing constellations.">
@@ -777,10 +776,10 @@
               - Coalesced pointer samples and 9px sweep steps help reliable snapping.
               - A quiet target halo previews the next star without adding UI clutter.
 
-           4. QUIET INFINITE COSMOS (CACHED NEBULAE, METEORS & SHOOTING STARS):
-              - Theme-tinted nebula textures are cached and drift almost imperceptibly
-                on a distant parallax plane; rare space objects move gently through it.
-              - Twinkling and atmospheric motion respect reduced-motion preferences.
+           4. QUIET INFINITE COSMOS (CACHED BACKDROP, METEORS & SHOOTING STARS):
+              - A restrained background layer is cached once per resize/theme change.
+              - Stars use independent four-point twinkle pulses in the existing render loop.
+              - Adaptive quality reduces background detail on slower screens; reduced-motion is respected.
            ===================================================================== */
 
         // =====================================================================
@@ -814,10 +813,10 @@
         const THEMES = {
             white: {
                 name: 'White',
-                skyTop: '#070710',
-                skyMid: '#0d0c1b',
-                skyBot: '#121322',
-                haze: 'rgba(154, 133, 206, 0.035)',
+                skyTop: '#070811',
+                skyMid: '#0a0b16',
+                skyBot: '#0b0c13',
+                haze: 'rgba(126, 105, 190, 0.018)',
                 accent: '#d8c9f3',
                 threadCore: 'rgba(246, 239, 226, 0.93)',
                 threadAura: 'rgba(216, 199, 174, 0.19)',
@@ -869,19 +868,15 @@
         let currentThemeKey = 'white';
         let theme = THEMES.white;
 
-        const NEBULA_PALETTES = {
-            white: [[112, 91, 164], [74, 91, 145], [136, 91, 139], [78, 103, 121]],
-            blue: [[65, 112, 165], [77, 145, 166], [93, 105, 164], [67, 130, 151]],
-            pink: [[151, 91, 145], [125, 92, 163], [166, 111, 143], [91, 91, 143]],
-            gold: [[151, 119, 76], [132, 103, 91], [155, 126, 93], [108, 101, 89]]
-        };
-
-
         // =====================================================================
         // 3. VIEWPORT, CAMERA & WORLD STATE
         // =====================================================================
         const canvas = document.getElementById('skyCanvas');
         const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+        // A low-resolution background is rendered only on resize/theme changes.
+        // It replaces the old per-frame nebula tile grid and keeps the sky clean.
+        const backgroundLayer = document.createElement('canvas');
+        const backgroundLayerCtx = backgroundLayer.getContext('2d', { alpha: false });
         let W = window.innerWidth;
         let H = window.innerHeight;
         let dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -896,7 +891,6 @@
         };
 
         const chunkCache = new Map();
-        const nebulaCache = new Map(); // Bounded LRU cache of pre-rendered, theme-tinted nebula cells
         const savedStars = new Map();
         let edges = [];
         let undoStack = [];
@@ -1690,6 +1684,7 @@
             currentThemeKey = key;
             theme = THEMES[key];
             document.documentElement.style.setProperty('--accent', theme.accent);
+            rebuildBackgroundLayer();
 
             document.querySelectorAll('.theme-btn').forEach(b => {
                 const active = b.id === 'th-' + key;
@@ -1706,129 +1701,84 @@
 
         const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // A first-visit demonstration drawn in the live canvas, never saved as user artwork.
-        const WELCOME_INTRO_KEY = 'skylight_welcome_intro_v1';
+        // First-visit constellation demonstration. Its nodes and threads are drawn
+        // temporarily on the canvas and never enter savedStars, edges, or undoStack.
+        const WELCOME_INTRO_KEY = 'skylight_welcome_heart_v1';
         const WELCOME_HEART_POINTS = [
-            [0.50, 0.89], [0.31, 0.72], [0.12, 0.49], [0.15, 0.29],
-            [0.29, 0.13], [0.43, 0.16], [0.50, 0.31], [0.57, 0.16],
-            [0.71, 0.13], [0.85, 0.29], [0.88, 0.49], [0.69, 0.72],
-            [0.50, 0.89]
+            [0.50, 0.86], [0.30, 0.68], [0.14, 0.46], [0.16, 0.26],
+            [0.29, 0.14], [0.42, 0.17], [0.50, 0.31], [0.58, 0.17],
+            [0.71, 0.14], [0.84, 0.26], [0.86, 0.46], [0.70, 0.68],
+            [0.50, 0.86]
         ];
         const welcomeHeartIntro = { active: false, startedAt: 0 };
 
-        function startWelcomeHeartIntro() {
-            if (welcomeHeartIntro.active) return;
-            welcomeHeartIntro.active = true;
-            welcomeHeartIntro.startedAt = performance.now();
-            try { localStorage.setItem(WELCOME_INTRO_KEY, '1'); } catch (e) {}
-        }
-
         function finishWelcomeHeartIntro() {
+            if (!welcomeHeartIntro.active) return;
             welcomeHeartIntro.active = false;
             try { localStorage.setItem(WELCOME_INTRO_KEY, '1'); } catch (e) {}
         }
 
-        function drawWelcomeSpark(x, y, size, pulse) {
-            const radius = size * pulse;
-            const glowRadius = radius * 4.4;
-            const glow = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
-            glow.addColorStop(0, `rgba(${theme.starRGB}, 0.95)`);
-            glow.addColorStop(0.22, `rgba(${theme.starRGB}, 0.34)`);
-            glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.shadowColor = `rgba(${theme.starRGB}, 0.9)`;
-            ctx.shadowBlur = radius * 2.2;
-            ctx.fillStyle = `rgba(${theme.starRGB}, 0.98)`;
-            ctx.beginPath();
-            ctx.moveTo(0, -radius * 2.65);
-            ctx.quadraticCurveTo(radius * 0.16, -radius * 0.16, radius * 2.65, 0);
-            ctx.quadraticCurveTo(radius * 0.16, radius * 0.16, 0, radius * 2.65);
-            ctx.quadraticCurveTo(-radius * 0.16, radius * 0.16, -radius * 2.65, 0);
-            ctx.quadraticCurveTo(-radius * 0.16, -radius * 0.16, 0, -radius * 2.65);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
+        function launchWelcomeHeartIntroForFirstVisit() {
+            try {
+                if (localStorage.getItem(WELCOME_INTRO_KEY) === '1') return;
+                // Never cover a returning user's existing constellation work.
+                if (savedStars.size > 0 || edges.length > 0 || prefersReducedMotion) {
+                    localStorage.setItem(WELCOME_INTRO_KEY, '1');
+                    return;
+                }
+            } catch (e) {}
+            welcomeHeartIntro.active = true;
+            welcomeHeartIntro.startedAt = performance.now();
         }
 
         function drawWelcomeHeartIntro(frameTime) {
             if (!welcomeHeartIntro.active) return;
-
             const elapsed = Math.max(0, frameTime - welcomeHeartIntro.startedAt);
-            const drawDuration = prefersReducedMotion ? 1100 : 4700;
-            const holdDuration = prefersReducedMotion ? 120 : 900;
-            const fadeDuration = prefersReducedMotion ? 250 : 850;
-            const totalDuration = drawDuration + holdDuration + fadeDuration;
-
-            if (elapsed >= totalDuration) {
+            const drawDuration = 4700;
+            const fadeDuration = 1050;
+            if (elapsed >= drawDuration + fadeDuration) {
                 finishWelcomeHeartIntro();
                 return;
             }
 
-            const fadeStart = drawDuration + holdDuration;
-            const fade = elapsed > fadeStart ? Math.max(0, 1 - (elapsed - fadeStart) / fadeDuration) : 1;
             const progress = Math.min(1, elapsed / drawDuration);
-
-            const heartWidth = Math.min(W * 0.78, H * 0.56, 360);
-            const heartHeight = heartWidth * 0.80;
-            const left = (W - heartWidth) * 0.5;
-            const top = (H - heartHeight) * 0.5;
-            const points = WELCOME_HEART_POINTS.map(([x, y]) => ({
-                x: left + x * heartWidth,
-                y: top + y * heartHeight
-            }));
-
+            const fade = elapsed > drawDuration
+                ? Math.max(0, 1 - (elapsed - drawDuration) / fadeDuration) : 1;
+            const width = Math.min(W * 0.68, H * 0.62, 340);
+            const height = width * 0.78;
+            const left = (W - width) * 0.5;
+            const top = (H - height) * 0.5;
+            const points = WELCOME_HEART_POINTS.map(([x, y]) => ({ x: left + x * width, y: top + y * height }));
             const segmentProgress = progress * (points.length - 1);
-            const completedSegments = Math.floor(segmentProgress);
-            const partialSegment = segmentProgress - completedSegments;
+            const completeSegments = Math.floor(segmentProgress);
+            const partial = segmentProgress - completeSegments;
 
             ctx.save();
             ctx.globalCompositeOperation = 'lighter';
-            ctx.globalAlpha = fade;
-
-            // Threads appear in sequence, teaching the connect-and-weave gesture.
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 0; i < completedSegments && i < points.length - 1; i++) {
-                ctx.lineTo(points[i + 1].x, points[i + 1].y);
-            }
-            if (completedSegments < points.length - 1) {
-                const a = points[completedSegments];
-                const b = points[completedSegments + 1];
-                ctx.lineTo(a.x + (b.x - a.x) * partialSegment, a.y + (b.y - a.y) * partialSegment);
-            }
-            ctx.strokeStyle = `rgba(${theme.starRGB}, 0.72)`;
-            ctx.lineWidth = Math.max(1.1, Math.min(1.8, heartWidth / 190));
-            ctx.shadowColor = `rgba(${theme.starRGB}, 0.75)`;
-            ctx.shadowBlur = 12;
+            ctx.globalAlpha = fade * 0.82;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            ctx.strokeStyle = `rgba(${theme.starRGB}, 0.72)`;
+            ctx.lineWidth = Math.max(1.15, Math.min(1.9, width / 185));
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 0; i < completeSegments && i < points.length - 1; i++) {
+                ctx.lineTo(points[i + 1].x, points[i + 1].y);
+            }
+            if (completeSegments < points.length - 1) {
+                const from = points[completeSegments];
+                const to = points[completeSegments + 1];
+                ctx.lineTo(from.x + (to.x - from.x) * partial, from.y + (to.y - from.y) * partial);
+            }
             ctx.stroke();
 
-            // The nodes are rendered as individual luminous stars, not as a banner or image.
-            const visibleStars = Math.min(points.length - 1, completedSegments + 1);
-            for (let i = 0; i < visibleStars; i++) {
+            const visibleNodes = Math.min(points.length, completeSegments + 1);
+            for (let i = 0; i < visibleNodes; i++) {
                 const p = points[i];
-                const pulse = prefersReducedMotion ? 1 : 0.84 + 0.16 * Math.sin(elapsed * 0.005 + i * 1.71);
-                const size = 2.0 + (i % 4) * 0.42;
-                drawWelcomeSpark(p.x, p.y, size, pulse);
+                const pulse = 0.88 + 0.12 * Math.sin(elapsed * 0.005 + i * 1.63);
+                drawFourPointSpark(p.x, p.y, (3.2 + (i === 0 ? 1.0 : 0)) * pulse, fade * 0.72);
             }
             ctx.restore();
-        }
-
-        // Existing stored app state means this is a returning user: do not interrupt them.
-        function shouldShowWelcomeIntro() {
-            try {
-                return !localStorage.getItem(CONFIG.STORAGE_KEY)
-                    && localStorage.getItem(WELCOME_INTRO_KEY) !== '1';
-            } catch (e) {
-                return false;
-            }
         }
 
         function spawnShootingStar() {
@@ -1903,82 +1853,43 @@
         // =====================================================================
         // 9. MAIN 60FPS RENDER LOOP (WITH LIVELY DEEP-SPACE METEORS)
         // =====================================================================
-        function getNebulaCell(nx, ny, cellSize, cacheLimit, textureSize) {
-            const key = `${currentThemeKey},${nx},${ny},${textureSize}`;
-            if (nebulaCache.has(key)) {
-                const cached = nebulaCache.get(key);
-                nebulaCache.delete(key);
-                nebulaCache.set(key, cached);
-                return cached;
-            }
-
-            let seed = Math.imul(nx ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(ny ^ 0xc2b2ae35, 0x27d4eb2d);
-            seed = Math.imul(seed ^ (seed >>> 16), 0x7feb352d);
-            seed = (seed ^ (seed >>> 15)) >>> 0;
-            const rand = () => {
-                seed = (seed + 0x6D2B79F5) >>> 0;
-                let value = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-                value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
-                return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-            };
-
-            let cloud = null;
-            if (rand() >= 0.12) {
-                const colors = NEBULA_PALETTES[currentThemeKey] || NEBULA_PALETTES.white;
-                // Place each seeded cloud around its grid anchor with broad jitter.
-                // This guarantees nearby haze is present around the initial camera too.
-                const wx = (nx + (rand() - 0.5) * 0.56) * cellSize;
-                const wy = (ny + (rand() - 0.5) * 0.56) * cellSize;
-                const radius = 560 + rand() * 500;
-                const color = colors[Math.floor(rand() * colors.length)];
-                const texture = document.createElement('canvas');
-                const center = textureSize * 0.5;
-                const unit = textureSize / 160;
-                texture.width = texture.height = textureSize;
-                const nctx = texture.getContext('2d');
-
-                nctx.save();
-                nctx.translate(center, center);
-                nctx.rotate((rand() - 0.5) * 1.2);
-                nctx.scale(1.55, 0.78);
-                const mainRadius = 53 * unit;
-                const main = nctx.createRadialGradient(0, 0, 1.2 * unit, 0, 0, mainRadius);
-                main.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.205)`);
-                main.addColorStop(0.42, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.112)`);
-                main.addColorStop(0.76, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.038)`);
-                main.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                nctx.fillStyle = main;
-                nctx.fillRect(-mainRadius, -mainRadius, mainRadius * 2, mainRadius * 2);
-                nctx.restore();
-
-                const lobeX = center + (rand() - 0.5) * 76 * unit;
-                const lobeY = center + (rand() - 0.5) * 44 * unit;
-                const lobeRadius = (42 + rand() * 15) * unit;
-                const lobe = nctx.createRadialGradient(lobeX, lobeY, 0, lobeX, lobeY, lobeRadius);
-                lobe.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.128)`);
-                lobe.addColorStop(0.55, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.061)`);
-                lobe.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                nctx.fillStyle = lobe;
-                nctx.fillRect(lobeX - lobeRadius, lobeY - lobeRadius, lobeRadius * 2, lobeRadius * 2);
-
-                cloud = { canvas: texture, x: wx, y: wy, radius };
-            }
-
-            nebulaCache.set(key, cloud);
-            while (nebulaCache.size > cacheLimit) {
-                const oldestKey = nebulaCache.keys().next().value;
-                nebulaCache.delete(oldestKey);
-            }
-            return cloud;
-        }
-
         let lastFrameTime = 0;
+        let adaptiveQualityLevel = 0;
+        let frameTimeAverage = 16.7;
+        let slowFrameCount = 0;
+        let smoothFrameCount = 0;
+
+        function updateAdaptiveQuality(elapsed) {
+            // Hysteresis prevents the quality tier from rapidly oscillating.
+            frameTimeAverage = frameTimeAverage * 0.94 + elapsed * 0.06;
+            if (frameTimeAverage > 23.5) {
+                slowFrameCount++;
+                smoothFrameCount = 0;
+            } else if (frameTimeAverage < 18.5) {
+                smoothFrameCount++;
+                slowFrameCount = 0;
+            } else {
+                slowFrameCount = Math.max(0, slowFrameCount - 1);
+                smoothFrameCount = Math.max(0, smoothFrameCount - 1);
+            }
+
+            if (slowFrameCount >= 75 && adaptiveQualityLevel < 2) {
+                adaptiveQualityLevel++;
+                slowFrameCount = 0;
+                smoothFrameCount = 0;
+            } else if (smoothFrameCount >= 300 && adaptiveQualityLevel > 0) {
+                adaptiveQualityLevel--;
+                smoothFrameCount = 0;
+                slowFrameCount = 0;
+            }
+        }
 
         function renderFrame(frameTime = performance.now()) {
             const elapsed = lastFrameTime ? Math.max(0, frameTime - lastFrameTime) : 1000 / 60;
             const deltaMs = Math.min(50, elapsed || 1000 / 60);
             const frameScale = deltaMs / (1000 / 60);
             lastFrameTime = frameTime;
+            updateAdaptiveQuality(elapsed);
 
             ctx.clearRect(0, 0, W, H);
             const tNow = frameTime * 0.001;
@@ -2014,53 +1925,13 @@
 
             const zScale = Math.max(0.20, Math.pow(cam.zoom, 0.78));
 
-            // 1. Deep Natural Night Sky Gradient
-            const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
-            skyGrad.addColorStop(0, theme.skyTop);
-            skyGrad.addColorStop(0.58, theme.skyMid);
-            skyGrad.addColorStop(1, theme.skyBot);
-            ctx.fillStyle = skyGrad;
-            ctx.fillRect(0, 0, W, H);
-
-            // 2. Quiet, infinite nebulae. Each cloud is rasterized once and reused;
-            //    the plane drifts slowly while remaining distant from the starfield.
-            const nebulaParallax = 0.20;
-            const nebulaCell = 2200;
-            // The cloud centers are already expressed in nebula-plane world units.
-            // Only the camera offset is parallax-scaled; the visible half-viewport is not.
-            const nebulaHalfW = (W * 0.5) / cam.zoom;
-            const nebulaHalfH = (H * 0.5) / cam.zoom;
-            const nebulaDriftX = prefersReducedMotion ? 0 : Math.sin(tNow * 0.018) * 13 + Math.sin(tNow * 0.007) * 5;
-            const nebulaDriftY = prefersReducedMotion ? 0 : Math.cos(tNow * 0.014) * 8;
-            const nebulaCamX = cam.x * nebulaParallax;
-            const nebulaCamY = cam.y * nebulaParallax;
-            const nMinX = Math.floor((nebulaCamX - nebulaHalfW) / nebulaCell) - 1;
-            const nMaxX = Math.floor((nebulaCamX + nebulaHalfW) / nebulaCell) + 1;
-            const nMinY = Math.floor((nebulaCamY - nebulaHalfH) / nebulaCell) - 1;
-            const nMaxY = Math.floor((nebulaCamY + nebulaHalfH) / nebulaCell) + 1;
-            const totalNebulaCells = (nMaxX - nMinX + 1) * (nMaxY - nMinY + 1);
-            // Bound both draw count and retained canvas memory on small Android devices.
-            const nebulaStride = Math.max(1, Math.ceil(totalNebulaCells / 180));
-            const sampledNebulaCells = Math.ceil(totalNebulaCells / nebulaStride);
-            const nebulaCacheLimit = Math.min(204, Math.max(72, sampledNebulaCells + 16));
-            const nebulaTextureSize = totalNebulaCells > 1200 ? 96 : (totalNebulaCells > 500 ? 112 : 128);
-            while (nebulaCache.size > nebulaCacheLimit) {
-                nebulaCache.delete(nebulaCache.keys().next().value);
-            }
-
-            for (let ny = nMinY; ny <= nMaxY; ny++) {
-                for (let nx = nMinX; nx <= nMaxX; nx++) {
-                    if (nebulaStride > 1 && Math.abs((nx * 31 + ny * 17) % nebulaStride) !== 0) continue;
-                    const cloud = getNebulaCell(nx, ny, nebulaCell, nebulaCacheLimit, nebulaTextureSize);
-                    if (!cloud) continue;
-                    const sx = (cloud.x - nebulaCamX) * cam.zoom + W * 0.5 + nebulaDriftX;
-                    const sy = (cloud.y - nebulaCamY) * cam.zoom + H * 0.5 + nebulaDriftY;
-                    const r = cloud.radius * cam.zoom;
-                    const drawW = r * 3.5;
-                    const drawH = r * 1.78;
-                    if (sx < -drawW || sx > W + drawW || sy < -drawH || sy > H + drawH) continue;
-                    ctx.drawImage(cloud.canvas, sx - drawW * 0.5, sy - drawH * 0.5, drawW, drawH);
-                }
+            // 1. Cached deep-space background. The layer is rebuilt only when
+            //    the viewport or theme changes, never during the animation loop.
+            if (backgroundLayer.width && backgroundLayer.height) {
+                ctx.drawImage(backgroundLayer, 0, 0, W, H);
+            } else {
+                ctx.fillStyle = theme.skyMid;
+                ctx.fillRect(0, 0, W, H);
             }
 
             // 3. Visible World Chunks
@@ -2073,8 +1944,10 @@
 
             // 4. Layered background dust. It remains visible when zoomed far out,
             //    so the universe gains depth instead of thinning into a blank field.
-            const dustFade = Math.min(0.94, 0.42 + cam.zoom * 0.72);
-            const dustStride = cam.zoom < 0.13 ? 2 : 1;
+            const dustFade = Math.min(0.78, 0.34 + cam.zoom * 0.58);
+            const zoomDustStride = cam.zoom < 0.13 ? 2 : 1;
+            const adaptiveDustStride = adaptiveQualityLevel >= 2 ? 5 : (adaptiveQualityLevel === 1 ? 3 : 1);
+            const dustStride = Math.max(zoomDustStride, adaptiveDustStride);
             const dustBuckets = [[], [], []];
             for (let cy = minCY; cy <= maxCY; cy++) {
                 for (let cx = minCX; cx <= maxCX; cx++) {
@@ -2089,7 +1962,7 @@
                     }
                 }
             }
-            const dustAlphas = [0.105, 0.16, 0.225];
+            const dustAlphas = [0.065, 0.105, 0.145];
             for (let band = 0; band < dustBuckets.length; band++) {
                 const bucket = dustBuckets[band];
                 if (!bucket.length) continue;
@@ -2269,8 +2142,11 @@
             }
 
             // 9. Draw Organic Stars
-            const unlinkedAlphaBoost = Math.min(1.0, Math.max(0.46, Math.pow(cam.zoom, 0.42)));
-            const macroStride = cam.zoom < 0.10 ? 2 : 1;
+            const unlinkedAlphaBoost = Math.min(1.0, Math.max(0.58, Math.pow(cam.zoom, 0.38)));
+            const zoomStarStride = cam.zoom < 0.10 ? 3 : (cam.zoom < 0.18 ? 2 : 1);
+            const adaptiveStarStride = adaptiveQualityLevel >= 2 && cam.zoom < 0.34 ? 3
+                : (adaptiveQualityLevel === 1 && cam.zoom < 0.20 ? 2 : 1);
+            const macroStride = Math.max(zoomStarStride, adaptiveStarStride);
 
             for (let cy = minCY; cy <= maxCY; cy++) {
                 for (let cx = minCX; cx <= maxCX; cx++) {
@@ -2288,25 +2164,33 @@
                         const isHovered = hoveredStar && hoveredStar.id === s.id && gesture.mode === 'none';
                         const isSnapPreview = gesture.mode === 'weave' && snapPreviewStar && snapPreviewStar.id === s.id;
                         const depth = Math.max(0, Math.min(1, (s.baseR - 2.2) / 1.5));
-                        // Per-star phase and frequency produce unsynchronised twinkle cycles.
-                        const twinkleSeed = s.phase * 2.13 + (s.freq || 220) * 0.013;
-                        const twinkleRateA = 0.36 + ((Math.sin(twinkleSeed * 1.7) + 1) * 0.5) * 0.48;
-                        const twinkleRateB = 0.15 + ((Math.sin(twinkleSeed * 2.31) + 1) * 0.5) * 0.25;
-                        const twinkleA = prefersReducedMotion ? 0 : Math.pow(Math.max(0, Math.sin(tNow * twinkleRateA + s.phase * 2.4)), 14) * 0.30;
-                        const twinkleB = prefersReducedMotion ? 0 : Math.pow(Math.max(0, Math.sin(tNow * twinkleRateB + s.phase * 4.1)), 12) * 0.14;
-                        const twinkle = twinkleA + twinkleB;
+                        // Very occasional, slow, independent glints.
+                        // Only a small seeded subset of stars twinkles, keeping the sky calm.
+                        const phaseFractionA = ((s.phase * 0.61803398875) % 1 + 1) % 1;
+                        const phaseFractionB = ((s.phase * 1.754877666) % 1 + 1) % 1;
+                        const twinkleEligible = phaseFractionA < 0.14;
+                        const twinklePeriod = 18 + phaseFractionB * 18;
+                        const twinkleOffset = phaseFractionB * twinklePeriod;
+                        const twinklePosition = (tNow + twinkleOffset) % twinklePeriod;
+                        const twinkleWindow = 1.65;
+                        const twinkleProgress = twinklePosition / twinkleWindow;
+                        const twinkleEnvelope = twinkleProgress >= 0 && twinkleProgress <= 1
+                            ? Math.pow(Math.sin(Math.PI * twinkleProgress), 2)
+                            : 0;
+                        const twinkle = prefersReducedMotion || !twinkleEligible ? 0 : twinkleEnvelope * 0.68;
                         const breath = prefersReducedMotion
                             ? 1
-                            : (0.965 + 0.035 * Math.sin(tNow * 0.72 + s.phase) * (0.88 + 0.12 * Math.sin(tNow * 0.21 + s.phase * 1.7))) * (1 + twinkle);
+                            : (0.994 + 0.006 * Math.sin(tNow * 0.24 + s.phase)) * (1 + twinkle * 0.08);
 
-                        const haloR = (links > 0 || isWeavingFrom || isHovered || isSnapPreview ? 12.2 : 8.2) * (0.94 + depth * 0.08) * breath * Math.max(0.34, zScale);
-                        const showHalo = links > 0 || isWeavingFrom || isHovered || isSnapPreview || cam.zoom >= 0.22 || twinkle > 0.065;
+                        // Most ordinary stars use no radial gradient. A halo is reserved
+                        // for linked/active stars and the brief moments when a star sparkles.
+                        const haloR = (links > 0 || isWeavingFrom || isHovered || isSnapPreview ? 12.2 : 6.0) * (0.94 + depth * 0.08) * breath * Math.max(0.34, zScale);
+                        const showHalo = links > 0 || isWeavingFrom || isHovered || isSnapPreview || twinkle > 0.16;
                         if (haloR >= 2.0 && showHalo) {
                             const halo = ctx.createRadialGradient(sc.x, sc.y, 0.3, sc.x, sc.y, haloR);
-                            const baseAlpha = isWeavingFrom ? 0.29 : (isSnapPreview ? 0.20 : (isHovered ? 0.19 : (links > 0 ? 0.25 : (0.115 * unlinkedAlphaBoost + twinkle * 0.15))));
+                            const baseAlpha = isWeavingFrom ? 0.29 : (isSnapPreview ? 0.20 : (isHovered ? 0.19 : (links > 0 ? 0.25 : 0.035 + twinkle * 0.10)));
                             halo.addColorStop(0, `rgba(${theme.starRGB}, ${baseAlpha})`);
                             halo.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
                             ctx.fillStyle = halo;
                             ctx.beginPath();
                             ctx.arc(sc.x, sc.y, haloR, 0, Math.PI * 2);
@@ -2325,12 +2209,24 @@
                             ctx.stroke();
                         }
 
-                        const coreR = Math.max(cam.zoom < 0.22 ? 0.88 : 0.78, s.baseR * (links > 0 ? 1.10 : 0.88) * zScale * (1 + twinkle * 0.10));
-                        const unlinkedCoreAlpha = Math.min(0.96, (0.66 + depth * 0.10) * unlinkedAlphaBoost * (1 + twinkle * 0.40));
-                        ctx.fillStyle = links > 0 ? `rgba(${theme.starRGB}, 0.91)` : `rgba(${theme.starRGB}, ${unlinkedCoreAlpha})`;
+                        const coreR = Math.max(cam.zoom < 0.22 ? 0.92 : 0.78, s.baseR * (links > 0 ? 1.10 : 0.88) * zScale);
+                        const coreAlpha = Math.min(0.98, (0.69 + depth * 0.12) * unlinkedAlphaBoost + twinkle * 0.18);
+                        ctx.fillStyle = links > 0 ? `rgba(${theme.starRGB}, 0.93)` : `rgba(${theme.starRGB}, ${coreAlpha})`;
                         ctx.beginPath();
                         ctx.arc(sc.x, sc.y, coreR, 0, Math.PI * 2);
                         ctx.fill();
+
+                        // The same four-point silhouette as the approved SkyLight icon.
+                        // Drawn only during a star's pulse to keep the effect light.
+                        if (twinkle > 0.22) {
+                            // Small, restrained four-point glint, close to the app icon's silhouette.
+                            const flareReach = 1.35 + twinkle * 1.55;
+                            ctx.save();
+                            ctx.globalCompositeOperation = 'lighter';
+                            drawFourPointSpark(sc.x, sc.y, flareReach * 1.35, twinkle * 0.075);
+                            drawFourPointSpark(sc.x, sc.y, flareReach, twinkle * 0.34);
+                            ctx.restore();
+                        }
 
                         if (isWeavingFrom || isHovered) {
                             ctx.strokeStyle = `rgba(${theme.starRGB}, ${isWeavingFrom ? 0.20 : 0.15})`;
@@ -2349,6 +2245,9 @@
                     }
                 }
             }
+
+            // First-visit guide: temporary points and threads, separate from user artwork.
+            drawWelcomeHeartIntro(frameTime);
 
             // 10. Ripples & Stardust
             for (let i = ripples.length - 1; i >= 0; i--) {
@@ -2381,40 +2280,100 @@
                 ctx.fill();
             }
 
-            // One-time canvas demonstration. This layer never touches saved stars or edges.
-            drawWelcomeHeartIntro(frameTime);
-
-            // 11. Soft edge vignette. No horizon line, so the sky stays endless.
-            drawSoftVignette();
+            // The vignette is baked into the cached background layer.
 
             if (!document.hidden) rafId = requestAnimationFrame(renderFrame);
         }
 
-        function drawSoftVignette() {
-            const radius = Math.max(W, H) * 0.82;
-            const vignette = ctx.createRadialGradient(
+        // Four-point sparkle used by the starfield and the one-time welcome animation.
+        // A small, curved diamond gives the icon's star silhouette without heavy filters.
+        function drawFourPointSpark(x, y, reach, alpha) {
+            if (alpha <= 0.01 || reach <= 0) return;
+            ctx.globalAlpha = Math.min(1, alpha);
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(x, y - reach);
+            ctx.quadraticCurveTo(x - reach * 0.13, y - reach * 0.14, x - reach, y);
+            ctx.quadraticCurveTo(x - reach * 0.13, y + reach * 0.14, x, y + reach);
+            ctx.quadraticCurveTo(x + reach * 0.13, y + reach * 0.14, x + reach, y);
+            ctx.quadraticCurveTo(x + reach * 0.13, y - reach * 0.14, x, y - reach);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+
+        function rebuildBackgroundLayer() {
+            if (!backgroundLayerCtx || !W || !H) return;
+            // Render at a fraction of the display resolution. Gradients upscale cleanly.
+            const layerScale = Math.min(1, Math.max(0.48, dpr * 0.58));
+            backgroundLayer.width = Math.max(1, Math.round(W * layerScale));
+            backgroundLayer.height = Math.max(1, Math.round(H * layerScale));
+            backgroundLayerCtx.setTransform(layerScale, 0, 0, layerScale, 0, 0);
+            const bg = backgroundLayerCtx;
+
+            const sky = bg.createLinearGradient(0, 0, 0, H);
+            sky.addColorStop(0, theme.skyTop);
+            sky.addColorStop(0.58, theme.skyMid);
+            sky.addColorStop(1, theme.skyBot);
+            bg.fillStyle = sky;
+            bg.fillRect(0, 0, W, H);
+
+            // One broad, low-opacity colour wash replaces many separate nebula blobs.
+            // This gives depth without visible purple patches or a muddy cloud texture.
+            const tints = {
+                white: [92, 70, 145],
+                blue: [52, 105, 158],
+                pink: [132, 80, 137],
+                gold: [132, 105, 66]
+            };
+            const tint = tints[currentThemeKey] || tints.white;
+            const glowRadius = Math.max(W, H) * 0.78;
+            const haze = bg.createRadialGradient(W * 0.47, H * 0.84, 0, W * 0.47, H * 0.84, glowRadius);
+            haze.addColorStop(0, `rgba(${tint[0]}, ${tint[1]}, ${tint[2]}, 0.016)`);
+            haze.addColorStop(0.46, `rgba(${tint[0]}, ${tint[1]}, ${tint[2]}, 0.006)`);
+            haze.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            bg.fillStyle = haze;
+            bg.fillRect(0, 0, W, H);
+
+            const cool = bg.createRadialGradient(W * 0.76, H * 0.34, 0, W * 0.76, H * 0.34, Math.max(W, H) * 0.55);
+            cool.addColorStop(0, `rgba(${tint[0]}, ${tint[1]}, ${tint[2]}, 0.004)`);
+            cool.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            bg.fillStyle = cool;
+            bg.fillRect(0, 0, W, H);
+
+            // Gentle edge falloff, baked once rather than allocated every frame.
+            const vignette = bg.createRadialGradient(
                 W * 0.5, H * 0.46, Math.min(W, H) * 0.16,
-                W * 0.5, H * 0.46, radius
+                W * 0.5, H * 0.46, Math.max(W, H) * 0.84
             );
-            vignette.addColorStop(0, 'rgba(3, 4, 9, 0)');
-            vignette.addColorStop(0.72, 'rgba(3, 4, 9, 0.025)');
-            vignette.addColorStop(1, 'rgba(3, 4, 9, 0.14)');
-            ctx.fillStyle = vignette;
-            ctx.fillRect(0, 0, W, H);
+            vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
+            vignette.addColorStop(0.76, 'rgba(0, 0, 0, 0.025)');
+            vignette.addColorStop(1, 'rgba(0, 0, 0, 0.16)');
+            bg.fillStyle = vignette;
+            bg.fillRect(0, 0, W, H);
         }
 
         function resize() {
             W = window.innerWidth;
             H = window.innerHeight;
-            const isSmallTouchDevice = window.matchMedia('(pointer: coarse)').matches && window.innerWidth < 900;
-            const deviceMemory = Number(navigator.deviceMemory) || 4;
-            const mobileDprCap = deviceMemory <= 2 ? 1.2 : (deviceMemory <= 4 ? 1.35 : 1.5);
-            dpr = Math.min(window.devicePixelRatio || 1, isSmallTouchDevice ? mobileDprCap : 2);
-            canvas.width = W * dpr;
-            canvas.height = H * dpr;
+            const isSmallTouchDevice = window.matchMedia('(pointer: coarse)').matches && Math.min(W, H) < 900;
+            const hasDeviceMemory = typeof navigator.deviceMemory === 'number' && navigator.deviceMemory > 0;
+            const deviceMemory = hasDeviceMemory ? navigator.deviceMemory : 0;
+            const cpuCores = Number(navigator.hardwareConcurrency) || 4;
+            const lowPowerDevice = (hasDeviceMemory && deviceMemory <= 2) || cpuCores <= 2;
+            const midPowerDevice = lowPowerDevice || (hasDeviceMemory && deviceMemory <= 4) || cpuCores <= 4;
+            const pixelBudget = lowPowerDevice ? 3400000 : (midPowerDevice ? 5600000 : 8200000);
+            const dprCap = isSmallTouchDevice
+                ? (lowPowerDevice ? 1.25 : (midPowerDevice ? 1.55 : 1.85))
+                : (lowPowerDevice ? 1.35 : (midPowerDevice ? 1.75 : 2.0));
+            const pixelBudgetDpr = Math.sqrt(pixelBudget / Math.max(1, W * H));
+            dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, dprCap, pixelBudgetDpr));
+            canvas.width = Math.round(W * dpr);
+            canvas.height = Math.round(H * dpr);
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
+            rebuildBackgroundLayer();
         }
 
         // =====================================================================
@@ -2502,9 +2461,8 @@
         window.addEventListener('pagehide', writeStateToStorage);
         window.addEventListener('resize', resize);
         resize();
-        const firstVisitNeedsIntro = shouldShowWelcomeIntro();
         loadStateFromStorage();
-        if (firstVisitNeedsIntro && savedStars.size === 0 && edges.length === 0) startWelcomeHeartIntro();
+        launchWelcomeHeartIntroForFirstVisit();
         setTimeout(() => {
             spawnShootingStar();
             spawnDeepSpaceMeteor();
